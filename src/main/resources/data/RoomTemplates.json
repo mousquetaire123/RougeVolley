@@ -1,0 +1,182 @@
+[
+  {
+    "id": "room_crossroad",
+    "name": "十字路口",
+    "widthTiles": 20,
+    "heightTiles": 15,
+    "tileWidth": 32,
+    "tileHeight": 32,
+    "pattern": [
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "....................",
+      "....................",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW"
+    ],
+    "doors": {
+      "N": {"x": 288, "y": 0, "w": 64, "h": 32},
+      "S": {"x": 288, "y": 448, "w": 64, "h": 32},
+      "W": {"x": 0, "y": 224, "w": 32, "h": 64},
+      "E": {"x": 608, "y": 224, "w": 32, "h": 64}
+    },
+    "playerSpawn": {"x": 320, "y": 256},
+    "enemySpawns": [
+      {"x": 96, "y": 96},
+      {"x": 512, "y": 96},
+      {"x": 96, "y": 352},
+      {"x": 512, "y": 352}
+    ]
+  },
+  {
+    "id": "room_corridor_h",
+    "name": "横走廊",
+    "widthTiles": 20,
+    "heightTiles": 15,
+    "tileWidth": 32,
+    "tileHeight": 32,
+    "pattern": [
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "....................",
+      "....................",
+      "....................",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWWWWWW"
+    ],
+    "doors": {
+      "W": {"x": 0, "y": 192, "w": 32, "h": 96},
+      "E": {"x": 608, "y": 192, "w": 32, "h": 96}
+    },
+    "playerSpawn": {"x": 320, "y": 224},
+    "enemySpawns": [
+      {"x": 160, "y": 224},
+      {"x": 480, "y": 224}
+    ]
+  },
+  {
+    "id": "room_corridor_v",
+    "name": "竖走廊",
+    "widthTiles": 20,
+    "heightTiles": 15,
+    "tileWidth": 32,
+    "tileHeight": 32,
+    "pattern": [
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW",
+      "WWWWWWWWW..WWWWWWWWW"
+    ],
+    "doors": {
+      "N": {"x": 288, "y": 0, "w": 64, "h": 32},
+      "S": {"x": 288, "y": 448, "w": 64, "h": 32}
+    },
+    "playerSpawn": {"x": 320, "y": 224},
+    "enemySpawns": [
+      {"x": 320, "y": 96},
+      {"x": 320, "y": 352}
+    ]
+  },
+  {
+    "id": "room_lshape",
+    "name": "L型房间",
+    "widthTiles": 20,
+    "heightTiles": 15,
+    "tileWidth": 32,
+    "tileHeight": 32,
+    "pattern": [
+      "WWWWWWWWWWWWWWWWWWWW",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W..................W",
+      "W...........WWWWWWW.",
+      "W...........WWWWWWW.",
+      "WWWWWWWWW..WWWWWWWWW"
+    ],
+    "doors": {
+      "S": {"x": 288, "y": 448, "w": 64, "h": 32},
+      "E": {"x": 608, "y": 384, "w": 32, "h": 64}
+    },
+    "playerSpawn": {"x": 320, "y": 224},
+    "enemySpawns": [
+      {"x": 96, "y": 96},
+      {"x": 512, "y": 96},
+      {"x": 320, "y": 352}
+    ]
+  },
+  {
+    "id": "room_hall",
+    "name": "大厅",
+    "widthTiles": 20,
+    "heightTiles": 15,
+    "tileWidth": 32,
+    "tileHeight": 32,
+    "pattern": [
+      "WWWWWWWWW..WWWWWWWWW",
+      "W..........W.......W",
+      "W...................W",
+      "W..........W.......W",
+      "....................",
+      "....................",
+      "....................",
+      "....................",
+      "....................",
+      "W...................W",
+      "W...................W",
+      "W..........W.......W",
+      "W...................W",
+      "W..........W.......W",
+      "WWWWWWWWW..WWWWWWWWW"
+    ],
+    "doors": {
+      "N": {"x": 288, "y": 0, "w": 64, "h": 32},
+      "S": {"x": 288, "y": 448, "w": 64, "h": 32},
+      "W": {"x": 0, "y": 192, "w": 32, "h": 96},
+      "E": {"x": 608, "y": 192, "w": 32, "h": 96}
+    },
+    "playerSpawn": {"x": 320, "y": 256},
+    "enemySpawns": [
+      {"x": 128, "y": 64},
+      {"x": 480, "y": 64},
+      {"x": 128, "y": 384},
+      {"x": 480, "y": 384},
+      {"x": 320, "y": 224}
+    ]
+  }
+]

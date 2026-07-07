@@ -21,6 +21,13 @@
             <version>21</version>
         </dependency>
 
+        <!-- JSON 解析（RoomTemplates.json 加载） -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+        </dependency>
+
         <!-- JUnit 5 测试框架 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
