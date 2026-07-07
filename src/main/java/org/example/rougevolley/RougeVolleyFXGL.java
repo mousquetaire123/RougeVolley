@@ -20,6 +20,7 @@ import org.example.rougevolley.core.GameState;
 import org.example.rougevolley.ecs.Entity;
 import org.example.rougevolley.ecs.components.*;
 import org.example.rougevolley.combat.DamageSystem;
+import org.example.rougevolley.combat.WeaponSystem;
 import org.example.rougevolley.entity.EntityFactory;
 
 import java.util.*;
@@ -255,59 +256,10 @@ public class RougeVolleyFXGL extends GameApplication {
     }
 
     /**
-     * 尝试发射武器（受冷却时间限制）
+     * 尝试发射武器（受冷却时间限制）—— 委托给 WeaponSystem
      */
     private void tryFireWeapon() {
-        if (player == null || !player.isActive()) return;
-
-        WeaponComponent weapon = player.getComponent(WeaponComponent.class).orElse(null);
-        if (weapon == null) return;
-
-        double now = gameState.getElapsedTime();
-        if (!weapon.canFire(now)) return;
-
-        weapon.markFired(now);
-
-        // 计算射击方向（从玩家指向鼠标）
-        double aimDx = mouseWorldPos.getX() - player.getX();
-        double aimDy = mouseWorldPos.getY() - player.getY();
-        double aimLen = Math.sqrt(aimDx * aimDx + aimDy * aimDy);
-        if (aimLen == 0) {
-            aimDx = 1;
-            aimDy = 0;
-            aimLen = 1;
-        }
-        double baseAngle = Math.toDegrees(Math.atan2(aimDy, aimDx));
-
-        // 按 bulletCount 生成弹丸
-        for (int i = 0; i < weapon.getBulletCount(); i++) {
-            double bulletAngle = baseAngle;
-            if (weapon.getBulletCount() > 1) {
-                // 均匀分布散布
-                double offset = (i - (weapon.getBulletCount() - 1) / 2.0) * weapon.getSpreadAngle();
-                bulletAngle += offset;
-            }
-            double rad = Math.toRadians(bulletAngle);
-            double vx = Math.cos(rad) * weapon.getBulletSpeed();
-            double vy = Math.sin(rad) * weapon.getBulletSpeed();
-
-            Entity bullet = EntityFactory.createBullet(
-                player.getX() + player.getComponent(PlayerComponent.class).get().getSize() / 2,
-                player.getY() + player.getComponent(PlayerComponent.class).get().getSize() / 2,
-                vx, vy,
-                weapon.getBulletDamage()
-            );
-            gameState.registerEntity(bullet);
-
-            // 创建子弹渲染节点
-            Circle bulletCircle = new Circle(GameConfig.BULLET_SIZE / 2, Color.ORANGE);
-            bulletCircle.setStroke(Color.YELLOW);
-            bulletCircle.setStrokeWidth(1);
-            FXGL.getGameScene().addUINode(bulletCircle);
-            renderNodes.put(bullet.getUuid(), bulletCircle);
-        }
-
-        FXGL.getEventBus().fireEvent(new Event(GameEvent.BULLET_FIRED_EVENT));
+        WeaponSystem.fire(player, mouseWorldPos, gameState, renderNodes);
     }
 
     // ============================================================
