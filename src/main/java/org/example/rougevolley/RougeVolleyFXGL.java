@@ -26,6 +26,7 @@ import org.example.rougevolley.ecs.Entity;
 import org.example.rougevolley.ecs.components.*;
 import org.example.rougevolley.combat.DamageSystem;
 import org.example.rougevolley.combat.WeaponSystem;
+import org.example.rougevolley.dungeon.*;
 import org.example.rougevolley.entity.EntityFactory;
 
 import java.util.*;
@@ -71,6 +72,15 @@ public class RougeVolleyFXGL extends GameApplication {
 
     // ── 调试 UI 引用 ──
     private Text debugText;
+
+    // ── 地牢系统 ──
+    private List<Room> dungeonRooms;
+    private Map<String, Room> dungeonMap;  // "col,row" → Room
+    private Room currentRoom;
+    private TileRenderer tileRenderer;
+
+    // ── 动态世界边界（由地牢生成后计算） ──
+    private double worldMinX, worldMinY, worldMaxX, worldMaxY;
 
     public static void main(String[] args) {
         launch(args);
@@ -146,21 +156,46 @@ public class RougeVolleyFXGL extends GameApplication {
 
         gameState = new GameState(seed);
 
-        // ── 加载房间模板并创建初始房间 ──
-        RoomPool pool = RoomPool.loadDefault();
-        RoomTemplate template = pool.getRandom();
-        startRoom = new Room(template, 0, 0);
-        startRoom.activate(gameState);
-        log.info("Room loaded: " + template.getName()
-            + " (" + template.getWidthTiles() + "x" + template.getHeightTiles() + " tiles)");
+        // ── 生成地牢 ──
+        Random dungeonRng = new Random(seed);
+        RoomPool roomPool = RoomPool.loadDefault(dungeonRng);
+        DungeonGenerator generator = new DungeonGenerator(roomPool, dungeonRng);
+        dungeonRooms = generator.generate();
 
-        // ── 从房间模板获取玩家出生点 ──
-        Point2D spawn = startRoom.getTemplate().getPlayerSpawn();
-        double spawnX = startRoom.getWorldX() + (spawn != null ? spawn.getX() : GameConfig.WORLD_WIDTH / 2.0);
-        double spawnY = startRoom.getWorldY() + (spawn != null ? spawn.getY() : GameConfig.WORLD_HEIGHT / 2.0);
+        // 构建网格坐标查找表
+        dungeonMap = new HashMap<>();
+        for (Room room : dungeonRooms) {
+            String key = room.getGridX() + "," + room.getGridY();
+            dungeonMap.put(key, room);
+        }
 
-        // ── 创建玩家 ──
-        player = EntityFactory.createPlayer(spawnX, spawnY);
+        // 计算动态世界边界
+        computeWorldBounds();
+
+        // ── 激活起始房间 (0,0) ──
+        currentRoom = dungeonMap.get("0,0");
+        if (currentRoom == null) {
+            currentRoom = dungeonRooms.get(0);
+        }
+        currentRoom.activate(gameState);
+
+        // ── 创建 TileRenderer 并构建起始房间 ──
+        tileRenderer = new TileRenderer();
+        tileRenderer.buildForRoom(currentRoom);
+
+        // ── 创建玩家（在起始房间的玩家生成点） ──
+        RoomTemplate startTemplate = currentRoom.getTemplate();
+        Point2D playerSpawn = startTemplate.getPlayerSpawn();
+        double playerWorldX, playerWorldY;
+        if (playerSpawn != null) {
+            playerWorldX = currentRoom.getWorldX() + playerSpawn.getX();
+            playerWorldY = currentRoom.getWorldY() + playerSpawn.getY();
+        } else {
+            // 回退：房间中心
+            playerWorldX = currentRoom.getWorldX() + startTemplate.getWidthPixels() / 2.0;
+            playerWorldY = currentRoom.getWorldY() + startTemplate.getHeightPixels() / 2.0;
+        }
+        player = EntityFactory.createPlayer(playerWorldX, playerWorldY);
         gameState.setPlayer(player);
         gameState.registerEntity(player);
 
@@ -176,11 +211,12 @@ public class RougeVolleyFXGL extends GameApplication {
         FXGL.getGameScene().addUINode(playerRect);
         renderNodes.put(player.getUuid(), playerRect);
 
-        // ── 为房间生成的敌人创建渲染节点 ──
-        ensureEnemyRenderNodes();
-
-        // ── 创建测试敌人（补充随机分布） ──
-        spawnTestEnemies();
+        // ── 为起始房间已生成的敌人创建渲染节点 ──
+        for (Entity e : gameState.getEntities()) {
+            if (!renderNodes.containsKey(e.getUuid()) && e.isActive()) {
+                createRenderNodeFor(e);
+            }
+        }
 
         // ── 构建 TileRenderer 并渲染房间地图 ──
         tileRenderer = new TileRenderer();
@@ -189,9 +225,9 @@ public class RougeVolleyFXGL extends GameApplication {
 
         // ── 初始化摄像机位置 ──
         cameraX = clamp(player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0,
-            0, GameConfig.WORLD_WIDTH - GameConfig.VIEWPORT_WIDTH);
+            worldMinX, worldMaxX - GameConfig.VIEWPORT_WIDTH);
         cameraY = clamp(player.getY() - GameConfig.VIEWPORT_HEIGHT / 2.0,
-            0, GameConfig.WORLD_HEIGHT - GameConfig.VIEWPORT_HEIGHT);
+            worldMinY, worldMaxY - GameConfig.VIEWPORT_HEIGHT);
         applyCameraPosition();
 
         // ── 调试信息 ──
@@ -200,7 +236,11 @@ public class RougeVolleyFXGL extends GameApplication {
         debugText.setFont(javafx.scene.text.Font.font("Monospaced", 13));
         FXGL.getGameScene().addUINode(debugText);
 
-        log.info("RougeVolley initialized. Player at (" + player.getX() + ", " + player.getY() + ")");
+        log.info("RougeVolley initialized. Dungeon: " + dungeonRooms.size() + " rooms. Player at ("
+            + player.getX() + ", " + player.getY() + ")");
+
+        // 触发地牢生成事件
+        FXGL.getEventBus().fireEvent(new Event(GameEvent.DUNGEON_GENERATED));
     }
 
     @Override
@@ -229,10 +269,18 @@ public class RougeVolleyFXGL extends GameApplication {
             }
         }
 
+        // ── 检测门碰撞与房间切换 ──
+        checkDoorTransitions();
+
+        // ── 检查房间是否已清空 ──
+        if (currentRoom != null) {
+            currentRoom.checkAndMarkCleared();
+        }
+
         // ── 同步渲染节点位置 ──
         syncRenderNodes();
 
-        // ── 同步 TileRenderer 视口 ──
+        // ── Tile 渲染同步（视口偏移） ──
         if (tileRenderer != null) {
             tileRenderer.sync(FXGL.getGameScene().getViewport().getXY());
         }
@@ -299,7 +347,7 @@ public class RougeVolleyFXGL extends GameApplication {
     // ============================================================
 
     /**
-     * 平滑跟随玩家并限制在世界边界内
+     * 平滑跟随玩家并限制在动态世界边界内
      */
     private void updateCamera(double dt) {
         if (player == null) return;
@@ -312,9 +360,11 @@ public class RougeVolleyFXGL extends GameApplication {
         cameraX += (targetX - cameraX) * lerpFactor;
         cameraY += (targetY - cameraY) * lerpFactor;
 
-        // 限制在世界边界内
-        cameraX = clamp(cameraX, 0, GameConfig.WORLD_WIDTH - GameConfig.VIEWPORT_WIDTH);
-        cameraY = clamp(cameraY, 0, GameConfig.WORLD_HEIGHT - GameConfig.VIEWPORT_HEIGHT);
+        // 限制在动态世界边界内（由地牢房间包围盒计算）
+        double boundRight = Math.max(worldMaxX - GameConfig.VIEWPORT_WIDTH, worldMinX);
+        double boundBottom = Math.max(worldMaxY - GameConfig.VIEWPORT_HEIGHT, worldMinY);
+        cameraX = clamp(cameraX, worldMinX, boundRight);
+        cameraY = clamp(cameraY, worldMinY, boundBottom);
 
         applyCameraPosition();
     }
@@ -325,16 +375,194 @@ public class RougeVolleyFXGL extends GameApplication {
     }
 
     // ============================================================
+    //  门碰撞检测与房间切换 (Problem 5.2)
+    // ============================================================
+
+    /**
+     * 检测玩家是否进入当前房间的门区域，若进入则切换房间。
+     */
+    private void checkDoorTransitions() {
+        if (currentRoom == null || player == null) return;
+
+        for (String dir : currentRoom.getDoorDirections()) {
+            if (!currentRoom.canPassThrough(dir)) continue;
+
+            var doorBounds = currentRoom.getDoorWorldBounds(dir);
+            if (doorBounds == null) continue;
+
+            if (doorBounds.contains(player.getX(), player.getY())) {
+                transitionToRoom(dir);
+                break;
+            }
+        }
+    }
+
+    /**
+     * 沿指定方向切换到相邻房间。
+     * <p>
+     * 流程：停用当前房间 → 清除 tiles → 激活目标房间 → 重建 tiles →
+     * 将玩家传送到目标房间的对面门位置。
+     */
+    private void transitionToRoom(String direction) {
+        // 计算目标房间网格坐标
+        int dx = 0, dy = 0;
+        switch (direction) {
+            case "N" -> dy = -1;
+            case "S" -> dy = 1;
+            case "W" -> dx = -1;
+            case "E" -> dx = 1;
+            default -> { return; }
+        }
+
+        int targetGx = currentRoom.getGridX() + dx;
+        int targetGy = currentRoom.getGridY() + dy;
+        String key = targetGx + "," + targetGy;
+        Room target = dungeonMap.get(key);
+        if (target == null) return;
+
+        log.info("Transitioning " + direction + " → room (" + targetGx + "," + targetGy + ")");
+
+        // ── 停用当前房间 ──
+        currentRoom.deactivate(gameState);
+        // 移除当前房间实体的渲染节点（玩家除外）
+        for (Entity e : gameState.getEntities()) {
+            if (e != player && renderNodes.containsKey(e.getUuid())) {
+                javafx.scene.Node node = renderNodes.remove(e.getUuid());
+                if (node != null) {
+                    FXGL.getGameScene().removeUINode(node);
+                }
+            }
+        }
+
+        // ── 清除 tiles ──
+        if (tileRenderer != null) {
+            tileRenderer.clear();
+        }
+
+        // ── 激活目标房间 ──
+        target.activate(gameState);
+        if (tileRenderer != null) {
+            tileRenderer.buildForRoom(target);
+        }
+        currentRoom = target;
+
+        // ── 为新生实体创建渲染节点 ──
+        for (Entity e : gameState.getEntities()) {
+            if (e != player && !renderNodes.containsKey(e.getUuid()) && e.isActive()) {
+                createRenderNodeFor(e);
+            }
+        }
+
+        // ── 将玩家传送到目标房间的对面门位置 ──
+        String oppositeDir = getOppositeDirection(direction);
+        var oppositeDoor = target.getDoorWorldBounds(oppositeDir);
+        if (oppositeDoor != null) {
+            // 放置在门内侧一点，防止立即再次触发切换
+            double spawnX = oppositeDoor.getMinX() + oppositeDoor.getWidth() / 2.0;
+            double spawnY = oppositeDoor.getMinY() + oppositeDoor.getHeight() / 2.0;
+            double pushBack = GameConfig.PLAYER_SIZE;
+            switch (oppositeDir) {
+                case "N" -> spawnY += pushBack;
+                case "S" -> spawnY -= pushBack;
+                case "W" -> spawnX += pushBack;
+                case "E" -> spawnX -= pushBack;
+            }
+            player.setPosition(new Point2D(spawnX, spawnY));
+        }
+
+        // ── 触发房间进入事件 ──
+        FXGL.getEventBus().fireEvent(new Event(GameEvent.ROOM_ENTERED));
+
+        log.info("Entered room " + target.getTemplate().getName() + " @(" + targetGx + "," + targetGy + ")");
+    }
+
+    /**
+     * 获取相反方向。
+     */
+    private static String getOppositeDirection(String dir) {
+        return switch (dir) {
+            case "N" -> "S";
+            case "S" -> "N";
+            case "W" -> "E";
+            case "E" -> "W";
+            default -> dir;
+        };
+    }
+
+    // ============================================================
+    //  世界边界计算 (Problem 5.3)
+    // ============================================================
+
+    /**
+     * 根据地牢所有房间的包围盒计算动态世界边界。
+     * 在 {@link #initGame()} 中地牢生成后调用。
+     */
+    private void computeWorldBounds() {
+        if (dungeonRooms == null || dungeonRooms.isEmpty()) {
+            // 回退到固定边界
+            worldMinX = 0;
+            worldMinY = 0;
+            worldMaxX = GameConfig.WORLD_WIDTH;
+            worldMaxY = GameConfig.WORLD_HEIGHT;
+            return;
+        }
+
+        worldMinX = Double.MAX_VALUE;
+        worldMinY = Double.MAX_VALUE;
+        worldMaxX = Double.MIN_VALUE;
+        worldMaxY = Double.MIN_VALUE;
+
+        for (Room room : dungeonRooms) {
+            double rx = room.getWorldX();
+            double ry = room.getWorldY();
+            double rw = room.getTemplate().getWidthPixels();
+            double rh = room.getTemplate().getHeightPixels();
+
+            worldMinX = Math.min(worldMinX, rx);
+            worldMinY = Math.min(worldMinY, ry);
+            worldMaxX = Math.max(worldMaxX, rx + rw);
+            worldMaxY = Math.max(worldMaxY, ry + rh);
+        }
+    }
+
+    // ============================================================
+    //  渲染节点辅助
+    // ============================================================
+
+    /**
+     * 为实体自动创建渲染节点（用于房间生成的敌人等未预创建节点的实体）。
+     */
+    private void createRenderNodeFor(Entity e) {
+        var enemyComp = e.getComponent(EnemyComponent.class);
+        if (enemyComp.isPresent()) {
+            double size = enemyComp.get().getSize();
+            Rectangle rect = new Rectangle(size, size, Color.CRIMSON);
+            rect.setArcWidth(4);
+            rect.setArcHeight(4);
+            rect.setStroke(Color.DARKRED);
+            rect.setStrokeWidth(1);
+            FXGL.getGameScene().addUINode(rect);
+            renderNodes.put(e.getUuid(), rect);
+        }
+    }
+
+    // ============================================================
     //  渲染同步
     // ============================================================
 
     /**
-     * 将每个实体的世界坐标转换为屏幕坐标并更新渲染节点
+     * 将每个实体的世界坐标转换为屏幕坐标并更新渲染节点。
+     * 对尚未有渲染节点的实体自动创建默认节点。
      */
     private void syncRenderNodes() {
         for (Entity e : gameState.getEntities()) {
             javafx.scene.Node node = renderNodes.get(e.getUuid());
-            if (node == null) continue;
+            if (node == null) {
+                // 自动创建尚未注册渲染节点的实体（如房间生成的敌人）
+                createRenderNodeFor(e);
+                node = renderNodes.get(e.getUuid());
+                if (node == null) continue;
+            }
 
             double screenX = e.getX() - cameraX;
             double screenY = e.getY() - cameraY;
@@ -368,68 +596,19 @@ public class RougeVolleyFXGL extends GameApplication {
         }
 
         if (debugText != null) {
+            String roomInfo = (currentRoom != null)
+                ? currentRoom.getTemplate().getName() + " (" + currentRoom.getGridX() + "," + currentRoom.getGridY() + ")"
+                : "none";
             debugText.setText(String.format(
-                "FPS: %.0f | Player: (%.0f, %.0f) | Entities: %d | Cam: (%.0f, %.0f)",
+                "FPS: %.0f | Player: (%.0f, %.0f) | Entities: %d | Room: %s | Cam: (%.0f, %.0f)",
                 currentFps,
                 player != null ? player.getX() : 0,
                 player != null ? player.getY() : 0,
                 gameState != null ? gameState.getEntities().size() : 0,
+                roomInfo,
                 cameraX, cameraY
             ));
         }
-    }
-
-    // ============================================================
-    //  测试工具
-    // ============================================================
-
-    /**
-     * 为所有缺少渲染节点的敌人实体创建 Rectangle 渲染节点。
-     * 用于房间模板激活后，为 Room.activate() 生成的敌人补建渲染节点。
-     */
-    private void ensureEnemyRenderNodes() {
-        for (Entity e : gameState.getEntities()) {
-            if (!renderNodes.containsKey(e.getUuid())
-                && e.hasComponent(EnemyComponent.class)
-                && e.isActive()) {
-                Rectangle rect = new Rectangle(GameConfig.ENEMY_SIZE, GameConfig.ENEMY_SIZE, Color.CRIMSON);
-                rect.setArcWidth(4);
-                rect.setArcHeight(4);
-                rect.setStroke(Color.DARKRED);
-                rect.setStrokeWidth(1);
-                FXGL.getGameScene().addUINode(rect);
-                renderNodes.put(e.getUuid(), rect);
-            }
-        }
-    }
-
-    /**
-     * 在世界中生成一些测试敌人
-     */
-    private void spawnTestEnemies() {
-        Random rng = new Random(gameState.getSeed());
-        int count = GameConfig.TEST_ENEMY_COUNT;
-        for (int i = 0; i < count; i++) {
-            double x = GameConfig.SPAWN_MARGIN + rng.nextDouble() * (GameConfig.WORLD_WIDTH - GameConfig.SPAWN_MARGIN * 2);
-            double y = GameConfig.SPAWN_MARGIN + rng.nextDouble() * (GameConfig.WORLD_HEIGHT - GameConfig.SPAWN_MARGIN * 2);
-
-            // 避免生成在玩家身上
-            if (Math.abs(x - player.getX()) < GameConfig.SPAWN_SAFE_RADIUS
-                && Math.abs(y - player.getY()) < GameConfig.SPAWN_SAFE_RADIUS) continue;
-
-            Entity enemy = EntityFactory.createDefaultEnemy(x, y);
-            gameState.registerEntity(enemy);
-
-            // 创建敌人渲染节点
-            Rectangle rect = new Rectangle(GameConfig.ENEMY_SIZE, GameConfig.ENEMY_SIZE, Color.CRIMSON);
-            rect.setArcWidth(4);
-            rect.setArcHeight(4);
-            rect.setStroke(Color.DARKRED);
-            rect.setStrokeWidth(1);
-            FXGL.getGameScene().addUINode(rect);
-            renderNodes.put(enemy.getUuid(), rect);
-        }
-        log.info("Spawned " + count + " test enemies");
     }
 
     // ============================================================
