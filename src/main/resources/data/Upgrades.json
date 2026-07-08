@@ -1,0 +1,23 @@
+[
+  {
+    "id": "rapid_fire",
+    "name": "急速",
+    "description": "射速提升 20%",
+    "type": "FIRE_RATE",
+    "value": 0.20
+  },
+  {
+    "id": "bullet_storm",
+    "name": "弹幕",
+    "description": "子弹数量 +1，散射角 +5°",
+    "type": "BULLET_COUNT",
+    "value": 1.0
+  },
+  {
+    "id": "vitality",
+    "name": "生命恢复",
+    "description": "回满生命，生命上限 +20",
+    "type": "HEALTH_RESTORE",
+    "value": 20.0
+  }
+]
