@@ -82,6 +82,14 @@ public class GameState {
         }
     }
 
+    /**
+     * 清空所有实体（重新开始或返回主菜单时使用）
+     */
+    public void clearAllEntities() {
+        entities.clear();
+        player = null;
+    }
+
     // ── Getters / Setters ──
 
     public long getSeed() { return seed; }

@@ -2,7 +2,6 @@ package org.example.rougevolley;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
-import com.almasb.fxgl.core.math.Vec2;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
@@ -12,7 +11,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
-
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import org.example.rougevolley.config.GameConfig;
@@ -28,51 +26,46 @@ import org.example.rougevolley.combat.DamageSystem;
 import org.example.rougevolley.combat.WeaponSystem;
 import org.example.rougevolley.dungeon.*;
 import org.example.rougevolley.entity.EntityFactory;
+import org.example.rougevolley.roguelike.UpgradeManager;
+import org.example.rougevolley.ui.GameUI;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * RougeVolley — FXGL 地牢探险游戏入口
- * <p>
- * 架构职责：
- * - 继承 FXGL GameApplication，管理窗口生命周期
- * - 持有 GameState（实体注册表、游戏阶段标记）
- * - 摄像机跟随玩家（平滑插值）
- * - 输入映射（WASD 移动、鼠标瞄准/射击）
- * - onUpdate 驱动：实体更新 → 清理 → 渲染同步 → 摄像机
  */
 public class RougeVolleyFXGL extends GameApplication {
 
     private static final Logger log = Logger.get(RougeVolleyFXGL.class);
 
-    // ── 游戏核心 ──
     private GameState gameState;
+    private UpgradeManager upgradeManager;
+    private GameUI gameUI;
     private Entity player;
 
-    // ── 渲染层映射 (entity uuid → JavaFX node) ──
     private final Map<String, javafx.scene.Node> renderNodes = new HashMap<>();
 
-    // ── 输入状态 ──
     private boolean moveUp, moveDown, moveLeft, moveRight;
     private boolean mouseFire;
     private Point2D mouseWorldPos = new Point2D(0, 0);
 
-    // ── 摄像机平滑 ──
     private double cameraX, cameraY;
 
-    // ── 地牢房间渲染 ──
     private TileRenderer tileRenderer;
     private Room startRoom;
 
-    // ── FPS 跟踪 ──
     private int frameCount;
     private double fpsAccumulator;
     private double currentFps;
 
-    // ── 调试 UI 引用 ──
     private Text debugText;
 
+    private boolean gameStarted;
+    private boolean hadEnemies;
+    private boolean upgradeTriggeredThisWave;
+
+    private long sessionSeed;
     // ── 地牢系统 ──
     private List<Room> dungeonRooms;
     private Map<String, Room> dungeonMap;  // "col,row" → Room
@@ -85,10 +78,6 @@ public class RougeVolleyFXGL extends GameApplication {
     public static void main(String[] args) {
         launch(args);
     }
-
-    // ============================================================
-    //  FXGL 生命周期
-    // ============================================================
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -105,7 +94,6 @@ public class RougeVolleyFXGL extends GameApplication {
     protected void initInput() {
         Input input = FXGL.getInput();
 
-        // ── WASD 移动 ──
         input.addAction(new UserAction("Move Up") {
             @Override protected void onActionBegin() { moveUp = true; }
             @Override protected void onActionEnd() { moveUp = false; }
@@ -142,7 +130,6 @@ public class RougeVolleyFXGL extends GameApplication {
             @Override protected void onActionEnd() { moveRight = false; }
         }, KeyCode.RIGHT);
 
-        // ── 鼠标射击 ──
         input.addAction(new UserAction("Fire") {
             @Override protected void onActionBegin() { mouseFire = true; }
             @Override protected void onActionEnd() { mouseFire = false; }
@@ -151,11 +138,133 @@ public class RougeVolleyFXGL extends GameApplication {
 
     @Override
     protected void initGame() {
-        long seed = ThreadLocalRandom.current().nextLong();
-        log.info("RougeVolley initializing... seed=" + seed);
+        sessionSeed = ThreadLocalRandom.current().nextLong();
+        log.info("RougeVolley initializing... seed=" + sessionSeed);
 
-        gameState = new GameState(seed);
+        gameState = new GameState(sessionSeed);
+        upgradeManager = new UpgradeManager(sessionSeed);
 
+        gameUI = new GameUI(gameState, upgradeManager);
+        gameUI.init(
+            this::startNewGame,
+            this::startNewGame,
+            this::returnToMainMenu,
+            option -> upgradeTriggeredThisWave = true
+        );
+        gameUI.showStartMenu();
+
+        debugText = new Text(10, 40, "");
+        debugText.setFill(Color.LIME);
+        debugText.setFont(javafx.scene.text.Font.font("Monospaced", 13));
+        FXGL.getGameScene().addUINode(debugText);
+
+        log.info("RougeVolley initialized. Waiting for player to start.");
+    }
+
+    @Override
+    protected void onUpdate(double tpf) {
+        if (gameState == null || !gameStarted) return;
+
+        gameUI.updateHud(player);
+
+        if (gameState.isGameOver()) return;
+        if (gameState.isPaused()) return;
+
+        double dt = Math.min(tpf, GameConfig.MAX_DELTA_TIME);
+
+        handleInput(dt);
+
+        gameState.updateEntities(dt);
+        gameState.addTime(dt);
+
+        DamageSystem.checkBulletEnemyCollisions(gameState);
+
+        List<String> removedUuids = gameState.cleanupDeadEntities();
+        for (String uuid : removedUuids) {
+            javafx.scene.Node node = renderNodes.remove(uuid);
+            if (node != null) {
+                FXGL.getGameScene().removeUINode(node);
+            }
+        }
+
+        syncRenderNodes();
+
+        if (tileRenderer != null) {
+            tileRenderer.sync(FXGL.getGameScene().getViewport().getXY());
+        }
+
+        updateCamera(dt);
+        checkPlayerDeath();
+        checkRoomCleared();
+        updateDebugInfo(dt);
+    }
+
+    // ── 游戏流程 ──
+
+    private void startNewGame() {
+        clearWorld();
+
+        sessionSeed = ThreadLocalRandom.current().nextLong();
+        gameState = new GameState(sessionSeed);
+        upgradeManager = new UpgradeManager(sessionSeed);
+        gameUI.bindGameState(gameState, upgradeManager);
+        gameUI.hideStartMenu();
+        gameUI.hideGameOver();
+
+        gameStarted = true;
+        hadEnemies = false;
+        upgradeTriggeredThisWave = false;
+        gameState.setGameOver(false);
+        gameState.setPaused(false);
+
+        loadStartRoom();
+        spawnPlayerInRoom();
+        ensureEnemyRenderNodes();
+        spawnTestEnemies();
+
+        tileRenderer = new TileRenderer();
+        tileRenderer.buildForRoom(startRoom);
+        log.info("TileRenderer built: " + tileRenderer.getTileCount() + " tiles");
+
+        cameraX = clamp(player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0,
+            0, GameConfig.WORLD_WIDTH - GameConfig.VIEWPORT_WIDTH);
+        cameraY = clamp(player.getY() - GameConfig.VIEWPORT_HEIGHT / 2.0,
+            0, GameConfig.WORLD_HEIGHT - GameConfig.VIEWPORT_HEIGHT);
+        applyCameraPosition();
+
+        log.info("New game started. Player at (" + player.getX() + ", " + player.getY() + ")");
+    }
+
+    private void returnToMainMenu() {
+        clearWorld();
+        gameStarted = false;
+        player = null;
+        startRoom = null;
+
+        sessionSeed = ThreadLocalRandom.current().nextLong();
+        gameState = new GameState(sessionSeed);
+        upgradeManager = new UpgradeManager(sessionSeed);
+        gameUI.bindGameState(gameState, upgradeManager);
+        gameUI.showStartMenu();
+
+        log.info("Returned to main menu.");
+    }
+
+    private void loadStartRoom() {
+        RoomPool pool = RoomPool.loadDefault();
+        RoomTemplate template = pool.getRandom();
+        startRoom = new Room(template, 0, 0);
+        startRoom.activate(gameState);
+        log.info("Room loaded: " + template.getName()
+            + " (" + template.getWidthTiles() + "x" + template.getHeightTiles() + " tiles)");
+    }
+
+    private void spawnPlayerInRoom() {
+        Point2D spawn = startRoom.getTemplate().getPlayerSpawn();
+        double spawnX = startRoom.getWorldX() + (spawn != null ? spawn.getX() : GameConfig.WORLD_WIDTH / 2.0);
+        double spawnY = startRoom.getWorldY() + (spawn != null ? spawn.getY() : GameConfig.WORLD_HEIGHT / 2.0);
+
+        player = EntityFactory.createPlayer(spawnX, spawnY);
         // ── 生成地牢 ──
         Random dungeonRng = new Random(seed);
         RoomPool roomPool = RoomPool.loadDefault(dungeonRng);
@@ -199,7 +308,6 @@ public class RougeVolleyFXGL extends GameApplication {
         gameState.setPlayer(player);
         gameState.registerEntity(player);
 
-        // ── 创建玩家渲染节点 ──
         Rectangle playerRect = new Rectangle(
             GameConfig.PLAYER_SIZE, GameConfig.PLAYER_SIZE,
             Color.DODGERBLUE
@@ -210,7 +318,26 @@ public class RougeVolleyFXGL extends GameApplication {
         playerRect.setStrokeWidth(1.5);
         FXGL.getGameScene().addUINode(playerRect);
         renderNodes.put(player.getUuid(), playerRect);
+    }
 
+    private void clearWorld() {
+        if (gameState != null) {
+            for (Entity e : new ArrayList<>(gameState.getEntities())) {
+                javafx.scene.Node node = renderNodes.remove(e.getUuid());
+                if (node != null) {
+                    FXGL.getGameScene().removeUINode(node);
+                }
+                e.destroy();
+            }
+            gameState.clearAllEntities();
+        }
+        renderNodes.clear();
+
+        if (tileRenderer != null) {
+            tileRenderer.clear();
+            tileRenderer = null;
+        }
+    }
         // ── 为起始房间已生成的敌人创建渲染节点 ──
         for (Entity e : gameState.getEntities()) {
             if (!renderNodes.containsKey(e.getUuid()) && e.isActive()) {
@@ -218,11 +345,16 @@ public class RougeVolleyFXGL extends GameApplication {
             }
         }
 
-        // ── 构建 TileRenderer 并渲染房间地图 ──
-        tileRenderer = new TileRenderer();
-        tileRenderer.buildForRoom(startRoom);
-        log.info("TileRenderer built: " + tileRenderer.getTileCount() + " tiles");
+    private void spawnTestEnemies() {
+        Random rng = new Random(gameState.getSeed());
+        int count = GameConfig.TEST_ENEMY_COUNT;
+        int spawned = 0;
+        for (int i = 0; i < count; i++) {
+            double x = GameConfig.SPAWN_MARGIN + rng.nextDouble() * (GameConfig.WORLD_WIDTH - GameConfig.SPAWN_MARGIN * 2);
+            double y = GameConfig.SPAWN_MARGIN + rng.nextDouble() * (GameConfig.WORLD_HEIGHT - GameConfig.SPAWN_MARGIN * 2);
 
+            if (Math.abs(x - player.getX()) < GameConfig.SPAWN_SAFE_RADIUS
+                && Math.abs(y - player.getY()) < GameConfig.SPAWN_SAFE_RADIUS) continue;
         // ── 初始化摄像机位置 ──
         cameraX = clamp(player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0,
             worldMinX, worldMaxX - GameConfig.VIEWPORT_WIDTH);
@@ -230,12 +362,20 @@ public class RougeVolleyFXGL extends GameApplication {
             worldMinY, worldMaxY - GameConfig.VIEWPORT_HEIGHT);
         applyCameraPosition();
 
-        // ── 调试信息 ──
-        debugText = new Text(10, 20, "");
-        debugText.setFill(Color.LIME);
-        debugText.setFont(javafx.scene.text.Font.font("Monospaced", 13));
-        FXGL.getGameScene().addUINode(debugText);
+            Entity enemy = EntityFactory.createDefaultEnemy(x, y);
+            gameState.registerEntity(enemy);
 
+            Rectangle rect = new Rectangle(GameConfig.ENEMY_SIZE, GameConfig.ENEMY_SIZE, Color.CRIMSON);
+            rect.setArcWidth(4);
+            rect.setArcHeight(4);
+            rect.setStroke(Color.DARKRED);
+            rect.setStrokeWidth(1);
+            FXGL.getGameScene().addUINode(rect);
+            renderNodes.put(enemy.getUuid(), rect);
+            spawned++;
+        }
+        hadEnemies = hadEnemies || spawned > 0;
+        log.info("Spawned " + spawned + " test enemies");
         log.info("RougeVolley initialized. Dungeon: " + dungeonRooms.size() + " rooms. Player at ("
             + player.getX() + ", " + player.getY() + ")");
 
@@ -243,32 +383,27 @@ public class RougeVolleyFXGL extends GameApplication {
         FXGL.getEventBus().fireEvent(new Event(GameEvent.DUNGEON_GENERATED));
     }
 
-    @Override
-    protected void onUpdate(double tpf) {
-        if (gameState == null || gameState.isGameOver()) return;
+    private void checkRoomCleared() {
+        if (gameUI.isUpgradeVisible() || upgradeTriggeredThisWave) return;
 
-        // 限制 dt 避免螺旋
-        double dt = Math.min(tpf, GameConfig.MAX_DELTA_TIME);
+        boolean hasLivingEnemies = gameState.getEntities().stream()
+            .anyMatch(e -> e.isActive() && e.hasComponent(EnemyComponent.class));
 
-        // ── 处理输入 ──
-        handleInput(dt);
-
-        // ── 更新所有实体 ──
-        gameState.updateEntities(dt);
-        gameState.addTime(dt);
-
-        // ── 子弹-敌人碰撞检测 ──
-        DamageSystem.checkBulletEnemyCollisions(gameState);
-
-        // ── 清理死亡实体 ──
-        List<String> removedUuids = gameState.cleanupDeadEntities();
-        for (String uuid : removedUuids) {
-            javafx.scene.Node node = renderNodes.remove(uuid);
-            if (node != null) {
-                FXGL.getGameScene().removeUINode(node);
-            }
+        if (hadEnemies && !hasLivingEnemies) {
+            FXGL.getEventBus().fireEvent(new Event(GameEvent.ROOM_CLEARED_EVENT));
         }
+    }
 
+    private void checkPlayerDeath() {
+        if (player == null || gameState.isGameOver()) return;
+
+        HealthComponent health = player.getComponent(HealthComponent.class).orElse(null);
+        if (health != null && health.isDead()) {
+            gameState.setGameOver(true);
+            gameState.setPaused(true);
+            gameUI.showGameOver();
+            FXGL.getEventBus().fireEvent(new Event(GameEvent.GAME_OVER_EVENT));
+            log.info("Player died — Game Over");
         // ── 检测门碰撞与房间切换 ──
         checkDoorTransitions();
 
@@ -284,17 +419,9 @@ public class RougeVolleyFXGL extends GameApplication {
         if (tileRenderer != null) {
             tileRenderer.sync(FXGL.getGameScene().getViewport().getXY());
         }
-
-        // ── 摄像机平滑跟随玩家 ──
-        updateCamera(dt);
-
-        // ── 更新调试信息 ──
-        updateDebugInfo(dt);
     }
 
-    // ============================================================
-    //  输入处理
-    // ============================================================
+    // ── 输入 ──
 
     private void handleInput(double dt) {
         if (player == null || !player.isActive()) return;
@@ -303,14 +430,12 @@ public class RougeVolleyFXGL extends GameApplication {
         MovementComponent mc = player.getComponent(MovementComponent.class).orElse(null);
         if (pc == null || mc == null) return;
 
-        // ── WASD 移动 ──
         double dx = 0, dy = 0;
         if (moveUp)    dy -= 1;
         if (moveDown)  dy += 1;
         if (moveLeft)  dx -= 1;
         if (moveRight) dx += 1;
 
-        // 归一化对角线移动
         double len = Math.sqrt(dx * dx + dy * dy);
         if (len > 0) {
             dx /= len;
@@ -320,31 +445,16 @@ public class RougeVolleyFXGL extends GameApplication {
             mc.stop();
         }
 
-        // ── 鼠标瞄准 ──
-        // FXGL Input 提供 getMouseXUI/YUI 获取屏幕坐标，转换为世界坐标
         double screenMouseX = FXGL.getInput().getMouseXUI();
         double screenMouseY = FXGL.getInput().getMouseYUI();
-        mouseWorldPos = new Point2D(
-            screenMouseX + cameraX,
-            screenMouseY + cameraY
-        );
+        mouseWorldPos = new Point2D(screenMouseX + cameraX, screenMouseY + cameraY);
 
-        // ── 鼠标射击 ──
         if (mouseFire) {
-            tryFireWeapon();
+            WeaponSystem.fire(player, mouseWorldPos, gameState, renderNodes);
         }
     }
 
-    /**
-     * 尝试发射武器（受冷却时间限制）—— 委托给 WeaponSystem
-     */
-    private void tryFireWeapon() {
-        WeaponSystem.fire(player, mouseWorldPos, gameState, renderNodes);
-    }
-
-    // ============================================================
-    //  摄像机
-    // ============================================================
+    // ── 摄像机 ──
 
     /**
      * 平滑跟随玩家并限制在动态世界边界内
@@ -355,11 +465,12 @@ public class RougeVolleyFXGL extends GameApplication {
         double targetX = player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0;
         double targetY = player.getY() - GameConfig.VIEWPORT_HEIGHT / 2.0;
 
-        // 平滑插值（lerp）
         double lerpFactor = 1.0 - Math.exp(GameConfig.CAMERA_LERP_SPEED * dt);
         cameraX += (targetX - cameraX) * lerpFactor;
         cameraY += (targetY - cameraY) * lerpFactor;
 
+        cameraX = clamp(cameraX, 0, GameConfig.WORLD_WIDTH - GameConfig.VIEWPORT_WIDTH);
+        cameraY = clamp(cameraY, 0, GameConfig.WORLD_HEIGHT - GameConfig.VIEWPORT_HEIGHT);
         // 限制在动态世界边界内（由地牢房间包围盒计算）
         double boundRight = Math.max(worldMaxX - GameConfig.VIEWPORT_WIDTH, worldMinX);
         double boundBottom = Math.max(worldMaxY - GameConfig.VIEWPORT_HEIGHT, worldMinY);
@@ -373,6 +484,8 @@ public class RougeVolleyFXGL extends GameApplication {
         FXGL.getGameScene().getViewport().setX(cameraX);
         FXGL.getGameScene().getViewport().setY(cameraY);
     }
+
+    // ── 渲染同步 ──
 
     // ============================================================
     //  门碰撞检测与房间切换 (Problem 5.2)
@@ -567,7 +680,6 @@ public class RougeVolleyFXGL extends GameApplication {
             double screenX = e.getX() - cameraX;
             double screenY = e.getY() - cameraY;
 
-            // 视锥剔除
             if (screenX < GameConfig.CULL_MARGIN_NEG || screenX > GameConfig.VIEWPORT_WIDTH - GameConfig.CULL_MARGIN_NEG ||
                 screenY < GameConfig.CULL_MARGIN_NEG || screenY > GameConfig.VIEWPORT_HEIGHT - GameConfig.CULL_MARGIN_NEG) {
                 node.setVisible(false);
@@ -575,21 +687,34 @@ public class RougeVolleyFXGL extends GameApplication {
             }
             node.setVisible(true);
 
-            // Node 基类的 setTranslateX/Y 适用于所有子类
             node.setTranslateX(screenX);
             node.setTranslateY(screenY);
         }
     }
 
-    // ============================================================
-    //  调试
-    // ============================================================
+    private void ensureEnemyRenderNodes() {
+        for (Entity e : gameState.getEntities()) {
+            if (!renderNodes.containsKey(e.getUuid())
+                && e.hasComponent(EnemyComponent.class)
+                && e.isActive()) {
+                Rectangle rect = new Rectangle(GameConfig.ENEMY_SIZE, GameConfig.ENEMY_SIZE, Color.CRIMSON);
+                rect.setArcWidth(4);
+                rect.setArcHeight(4);
+                rect.setStroke(Color.DARKRED);
+                rect.setStrokeWidth(1);
+                FXGL.getGameScene().addUINode(rect);
+                renderNodes.put(e.getUuid(), rect);
+            }
+        }
+        if (gameState.getEntities().stream().anyMatch(e -> e.isActive() && e.hasComponent(EnemyComponent.class))) {
+            hadEnemies = true;
+        }
+    }
 
     private void updateDebugInfo(double dt) {
-        // 手动计算 FPS
         frameCount++;
         fpsAccumulator += dt;
-        if (fpsAccumulator >= 0.5) { // 每0.5秒更新一次 FPS
+        if (fpsAccumulator >= 0.5) {
             currentFps = frameCount / fpsAccumulator;
             frameCount = 0;
             fpsAccumulator = 0;
@@ -618,10 +743,6 @@ public class RougeVolleyFXGL extends GameApplication {
     private static double clamp(double val, double min, double max) {
         return Math.max(min, Math.min(max, val));
     }
-
-    // ============================================================
-    //  Getters
-    // ============================================================
 
     public GameState getGameState() { return gameState; }
     public Entity getPlayer() { return player; }
