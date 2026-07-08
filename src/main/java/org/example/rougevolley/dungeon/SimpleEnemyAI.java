@@ -26,9 +26,6 @@ public class SimpleEnemyAI implements Component {
     /** 当前巡逻方向（弧度） */
     private double patrolAngle = 0;
 
-    /** FXGL 应用缓存（按需查找） */
-    private RougeVolleyFXGL app;
-
     // ============================================================
     //  onAttach
     // ============================================================
@@ -102,7 +99,13 @@ public class SimpleEnemyAI implements Component {
      */
     private void chasePlayer(Entity owner, EnemyComponent ec,
                              MovementComponent mc, Point2D playerPos, Room room) {
-        Point2D dir = playerPos.subtract(owner.getPosition()).normalize();
+        Point2D delta = playerPos.subtract(owner.getPosition());
+        // 防御：玩家与敌人重合时停止移动
+        if (delta.magnitude() < 0.001) {
+            mc.stop();
+            return;
+        }
+        Point2D dir = delta.normalize();
 
         if (room != null && willHitWall(owner, room, dir.getX(), dir.getY())) {
             // 前方是墙 → 尝试滑行
@@ -173,9 +176,15 @@ public class SimpleEnemyAI implements Component {
     private boolean willHitWall(Entity owner, Room room, double vx, double vy) {
         if (room == null) return false;
 
+        // 归一化方向向量确保 lookAhead 距离准确
+        double len = Math.sqrt(vx * vx + vy * vy);
+        if (len < 0.001) return false;
+        double nx = vx / len;
+        double ny = vy / len;
+
         double lookAhead = GameConfig.TILE_SIZE * 1.5;
-        double futureX = owner.getX() + signOrZero(vx) * lookAhead;
-        double futureY = owner.getY() + signOrZero(vy) * lookAhead;
+        double futureX = owner.getX() + nx * lookAhead;
+        double futureY = owner.getY() + ny * lookAhead;
 
         int tileX = (int) ((futureX - room.getWorldX()) / GameConfig.TILE_SIZE);
         int tileY = (int) ((futureY - room.getWorldY()) / GameConfig.TILE_SIZE);
@@ -194,18 +203,8 @@ public class SimpleEnemyAI implements Component {
             .orElse(GameConfig.ENEMY_SPEED);
     }
 
-    /** 带零值保护的符号函数：v=0 时返回 0，否则返回 sign(v) */
-    private static double signOrZero(double v) {
-        if (v > 0) return 1;
-        if (v < 0) return -1;
-        return 0;
-    }
-
-    /** 获取玩家实体（带缓存） */
+    /** 获取玩家实体（每次从 FXGL 获取，避免缓存过时） */
     private Entity getPlayer() {
-        if (app == null) {
-            app = (RougeVolleyFXGL) FXGL.getApp();
-        }
-        return app.getPlayer();
+        return ((RougeVolleyFXGL) FXGL.getApp()).getPlayer();
     }
 }
