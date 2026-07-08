@@ -2,6 +2,7 @@ package org.example.rougevolley;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
+import com.almasb.fxgl.core.math.Vec2;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
@@ -17,6 +18,10 @@ import javafx.scene.text.Text;
 import org.example.rougevolley.config.GameConfig;
 import org.example.rougevolley.core.GameEvent;
 import org.example.rougevolley.core.GameState;
+import org.example.rougevolley.dungeon.Room;
+import org.example.rougevolley.dungeon.RoomPool;
+import org.example.rougevolley.dungeon.RoomTemplate;
+import org.example.rougevolley.dungeon.TileRenderer;
 import org.example.rougevolley.ecs.Entity;
 import org.example.rougevolley.ecs.components.*;
 import org.example.rougevolley.combat.DamageSystem;
@@ -54,6 +59,10 @@ public class RougeVolleyFXGL extends GameApplication {
 
     // ── 摄像机平滑 ──
     private double cameraX, cameraY;
+
+    // ── 地牢房间渲染 ──
+    private TileRenderer tileRenderer;
+    private Room startRoom;
 
     // ── FPS 跟踪 ──
     private int frameCount;
@@ -137,11 +146,21 @@ public class RougeVolleyFXGL extends GameApplication {
 
         gameState = new GameState(seed);
 
+        // ── 加载房间模板并创建初始房间 ──
+        RoomPool pool = RoomPool.loadDefault();
+        RoomTemplate template = pool.getRandom();
+        startRoom = new Room(template, 0, 0);
+        startRoom.activate(gameState);
+        log.info("Room loaded: " + template.getName()
+            + " (" + template.getWidthTiles() + "x" + template.getHeightTiles() + " tiles)");
+
+        // ── 从房间模板获取玩家出生点 ──
+        Point2D spawn = startRoom.getTemplate().getPlayerSpawn();
+        double spawnX = startRoom.getWorldX() + (spawn != null ? spawn.getX() : GameConfig.WORLD_WIDTH / 2.0);
+        double spawnY = startRoom.getWorldY() + (spawn != null ? spawn.getY() : GameConfig.WORLD_HEIGHT / 2.0);
+
         // ── 创建玩家 ──
-        player = EntityFactory.createPlayer(
-            GameConfig.WORLD_WIDTH / 2.0,
-            GameConfig.WORLD_HEIGHT / 2.0
-        );
+        player = EntityFactory.createPlayer(spawnX, spawnY);
         gameState.setPlayer(player);
         gameState.registerEntity(player);
 
@@ -157,8 +176,16 @@ public class RougeVolleyFXGL extends GameApplication {
         FXGL.getGameScene().addUINode(playerRect);
         renderNodes.put(player.getUuid(), playerRect);
 
-        // ── 创建测试敌人 ──
+        // ── 为房间生成的敌人创建渲染节点 ──
+        ensureEnemyRenderNodes();
+
+        // ── 创建测试敌人（补充随机分布） ──
         spawnTestEnemies();
+
+        // ── 构建 TileRenderer 并渲染房间地图 ──
+        tileRenderer = new TileRenderer();
+        tileRenderer.buildForRoom(startRoom);
+        log.info("TileRenderer built: " + tileRenderer.getTileCount() + " tiles");
 
         // ── 初始化摄像机位置 ──
         cameraX = clamp(player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0,
@@ -204,6 +231,11 @@ public class RougeVolleyFXGL extends GameApplication {
 
         // ── 同步渲染节点位置 ──
         syncRenderNodes();
+
+        // ── 同步 TileRenderer 视口 ──
+        if (tileRenderer != null) {
+            tileRenderer.sync(FXGL.getGameScene().getViewport().getXY());
+        }
 
         // ── 摄像机平滑跟随玩家 ──
         updateCamera(dt);
@@ -350,6 +382,26 @@ public class RougeVolleyFXGL extends GameApplication {
     // ============================================================
     //  测试工具
     // ============================================================
+
+    /**
+     * 为所有缺少渲染节点的敌人实体创建 Rectangle 渲染节点。
+     * 用于房间模板激活后，为 Room.activate() 生成的敌人补建渲染节点。
+     */
+    private void ensureEnemyRenderNodes() {
+        for (Entity e : gameState.getEntities()) {
+            if (!renderNodes.containsKey(e.getUuid())
+                && e.hasComponent(EnemyComponent.class)
+                && e.isActive()) {
+                Rectangle rect = new Rectangle(GameConfig.ENEMY_SIZE, GameConfig.ENEMY_SIZE, Color.CRIMSON);
+                rect.setArcWidth(4);
+                rect.setArcHeight(4);
+                rect.setStroke(Color.DARKRED);
+                rect.setStrokeWidth(1);
+                FXGL.getGameScene().addUINode(rect);
+                renderNodes.put(e.getUuid(), rect);
+            }
+        }
+    }
 
     /**
      * 在世界中生成一些测试敌人
