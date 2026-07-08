@@ -84,6 +84,35 @@ public final class DamageSystem {
     }
 
     /**
+     * 检测敌人与玩家之间的碰撞并施加接触伤害。
+     * 每帧由游戏主循环调用（受无敌时间保护）。
+     *
+     * @param player    玩家实体
+     * @param gameState 全局游戏状态
+     * @return 是否造成了伤害
+     */
+    public static boolean checkEnemyPlayerCollisions(Entity player, GameState gameState) {
+        if (player == null || !player.isActive()) return false;
+        HealthComponent playerHealth = player.getComponent(HealthComponent.class).orElse(null);
+        if (playerHealth == null || !playerHealth.isAlive()) return false;
+
+        double px = player.getX();
+        double py = player.getY();
+        double ps = GameConfig.PLAYER_SIZE;
+
+        for (Entity enemy : gameState.getEntities()) {
+            if (!enemy.isActive() || !enemy.hasComponent(EnemyComponent.class)) continue;
+            EnemyComponent ec = enemy.getComponent(EnemyComponent.class).get();
+            double es = ec.getSize();
+            if (rectIntersectsRect(px, py, ps, ps, enemy.getX(), enemy.getY(), es, es)) {
+                playerHealth.takeDamage(GameConfig.ENEMY_CONTACT_DAMAGE);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 矩形与矩形碰撞检测（AABB vs AABB）
      *
      * @param x1 矩形1左上角X

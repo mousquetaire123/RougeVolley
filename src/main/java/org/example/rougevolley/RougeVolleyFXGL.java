@@ -64,6 +64,7 @@ public class RougeVolleyFXGL extends GameApplication {
     private boolean gameStarted;
     private boolean hadEnemies;
     private boolean upgradeTriggeredThisWave;
+    private double lastPlayerDamageTime = -Double.MAX_VALUE / 2;
 
     private long sessionSeed;
 
@@ -159,6 +160,8 @@ public class RougeVolleyFXGL extends GameApplication {
         FXGL.getGameScene().addUINode(debugText);
 
         log.info("RougeVolley initialized. Waiting for player to start.");
+
+        FXGL.getEventBus().fireEvent(new Event(GameEvent.ENGINE_INIT_EVENT));
     }
 
     @Override
@@ -195,6 +198,35 @@ public class RougeVolleyFXGL extends GameApplication {
 
         DamageSystem.checkBulletEnemyCollisions(gameState);
 
+        // ── 敌人-玩家碰撞伤害（无敌时间保护） ──
+        if (now - lastPlayerDamageTime >= GameConfig.INVINCIBILITY_DURATION) {
+            if (DamageSystem.checkEnemyPlayerCollisions(player, gameState)) {
+                lastPlayerDamageTime = now;
+            }
+        }
+
+        // ── 道具拾取碰撞检测 ──
+        if (player != null && player.isActive()) {
+            double ps = GameConfig.PLAYER_SIZE;
+            for (Entity e : gameState.getEntities()) {
+                if (!e.isActive() || !e.hasComponent(PickupComponent.class)) continue;
+                PickupComponent pickup = e.getComponent(PickupComponent.class).orElse(null);
+                if (pickup == null || pickup.isCollected()) continue;
+                // AABB 重叠检测
+                if (player.getX() < e.getX() + 16 && player.getX() + ps > e.getX()
+                    && player.getY() < e.getY() + 16 && player.getY() + ps > e.getY()) {
+                    pickup.markCollected();
+                    e.setActive(false);
+                    FXGL.getEventBus().fireEvent(new Event(GameEvent.ITEM_PICKED_UP_EVENT));
+                    // 移除渲染节点
+                    javafx.scene.Node node = renderNodes.remove(e.getUuid());
+                    if (node != null) {
+                        FXGL.getGameScene().removeUINode(node);
+                    }
+                }
+            }
+        }
+
         List<String> removedUuids = gameState.cleanupDeadEntities();
         for (String uuid : removedUuids) {
             javafx.scene.Node node = renderNodes.remove(uuid);
@@ -230,8 +262,11 @@ public class RougeVolleyFXGL extends GameApplication {
         gameStarted = true;
         hadEnemies = false;
         upgradeTriggeredThisWave = false;
+        lastPlayerDamageTime = -Double.MAX_VALUE / 2;
         gameState.setGameOver(false);
         gameState.setPaused(false);
+
+        FXGL.getEventBus().fireEvent(new Event(GameEvent.GAME_RESTART_EVENT));
 
         // ── 生成地牢（使用全局确定性随机源） ──
         Random gameRng = gameState.getRandom();
@@ -251,7 +286,6 @@ public class RougeVolleyFXGL extends GameApplication {
 
         spawnPlayerInRoom();
         ensureEnemyRenderNodes();
-        spawnTestEnemies();
 
         cameraX = clamp(player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0,
             worldMinX, worldMaxX - GameConfig.VIEWPORT_WIDTH);
@@ -315,26 +349,7 @@ public class RougeVolleyFXGL extends GameApplication {
         playerRect.setStrokeWidth(1.5);
         FXGL.getGameScene().addUINode(playerRect);
         renderNodes.put(player.getUuid(), playerRect);
-    }
 
-    private void clearWorld() {
-        if (gameState != null) {
-            for (Entity e : new ArrayList<>(gameState.getEntities())) {
-                javafx.scene.Node node = renderNodes.remove(e.getUuid());
-                if (node != null) {
-                    FXGL.getGameScene().removeUINode(node);
-                }
-                e.destroy();
-            }
-            gameState.clearAllEntities();
-        }
-        renderNodes.clear();
-
-        if (tileRenderer != null) {
-            tileRenderer.clear();
-            tileRenderer = null;
-        }
-    }
         // ── 为起始房间已生成的敌人创建渲染节点 ──
         for (Entity e : gameState.getEntities()) {
             if (!renderNodes.containsKey(e.getUuid()) && e.isActive()) {
@@ -370,40 +385,14 @@ public class RougeVolleyFXGL extends GameApplication {
         }
     }
 
-    private void spawnTestEnemies() {
-        Random rng = gameState.getRandom();
-        int count = GameConfig.TEST_ENEMY_COUNT;
-        int spawned = 0;
-        for (int i = 0; i < count; i++) {
-            double x = GameConfig.SPAWN_MARGIN + rng.nextDouble() * (GameConfig.WORLD_WIDTH - GameConfig.SPAWN_MARGIN * 2);
-            double y = GameConfig.SPAWN_MARGIN + rng.nextDouble() * (GameConfig.WORLD_HEIGHT - GameConfig.SPAWN_MARGIN * 2);
-
-            if (Math.abs(x - player.getX()) < GameConfig.SPAWN_SAFE_RADIUS
-                && Math.abs(y - player.getY()) < GameConfig.SPAWN_SAFE_RADIUS) continue;
-
-            Entity enemy = EntityFactory.createDefaultEnemy(x, y);
-            gameState.registerEntity(enemy);
-
-            Rectangle rect = new Rectangle(GameConfig.ENEMY_SIZE, GameConfig.ENEMY_SIZE, Color.CRIMSON);
-            rect.setArcWidth(4);
-            rect.setArcHeight(4);
-            rect.setStroke(Color.DARKRED);
-            rect.setStrokeWidth(1);
-            FXGL.getGameScene().addUINode(rect);
-            renderNodes.put(enemy.getUuid(), rect);
-            spawned++;
-        }
-        hadEnemies = hadEnemies || spawned > 0;
-        log.info("Spawned " + spawned + " test enemies");
-    }
-
     private void checkRoomCleared() {
         if (gameUI.isUpgradeVisible() || upgradeTriggeredThisWave) return;
+        if (currentRoom == null) return;
 
-        boolean hasLivingEnemies = gameState.getEntities().stream()
-            .anyMatch(e -> e.isActive() && e.hasComponent(EnemyComponent.class));
+        // 使用房间级别的清空判定（仅检查当前房间的敌人）
+        boolean roomCleared = currentRoom.checkAndMarkCleared();
 
-        if (hadEnemies && !hasLivingEnemies) {
+        if (hadEnemies && roomCleared) {
             FXGL.getEventBus().fireEvent(new Event(GameEvent.ROOM_CLEARED_EVENT));
         }
     }
@@ -441,6 +430,7 @@ public class RougeVolleyFXGL extends GameApplication {
             dx /= len;
             dy /= len;
             mc.setVelocity(dx * pc.getSpeed(), dy * pc.getSpeed());
+            FXGL.getEventBus().fireEvent(new Event(GameEvent.PLAYER_MOVED_EVENT));
         } else {
             mc.stop();
         }
@@ -585,6 +575,8 @@ public class RougeVolleyFXGL extends GameApplication {
 
         // ── 触发房间进入事件 ──
         FXGL.getEventBus().fireEvent(new Event(GameEvent.ROOM_ENTERED_EVENT));
+        // ── 触发区域变化事件（难度/环境切换） ──
+        FXGL.getEventBus().fireEvent(new Event(GameEvent.ZONE_CHANGED_EVENT));
 
         // ── 重置房间状态标志，允许新房间触发升级 ──
         hadEnemies = false;
@@ -740,10 +732,6 @@ public class RougeVolleyFXGL extends GameApplication {
             ));
         }
     }
-
-    // ============================================================
-    //  测试工具
-    // ============================================================
 
     // ============================================================
     //  工具

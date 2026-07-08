@@ -1,5 +1,7 @@
 package org.example.rougevolley.core;
 
+import com.almasb.fxgl.dsl.FXGL;
+import javafx.event.Event;
 import org.example.rougevolley.ecs.Entity;
 
 import java.util.*;
@@ -43,6 +45,8 @@ public class GameState {
     public void registerEntity(Entity entity) {
         Objects.requireNonNull(entity);
         entities.add(entity);
+        // 通知所有订阅者有新实体生成
+        FXGL.getEventBus().fireEvent(new Event(GameEvent.ENTITY_SPAWNED_EVENT));
     }
 
     /**
