@@ -11,7 +11,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import org.example.rougevolley.config.GameConfig;

@@ -5,7 +5,7 @@ import javafx.event.Event;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import org.example.rougevolley.config.GameConfig;
 import org.example.rougevolley.core.GameEvent;
 import org.example.rougevolley.core.GameState;
@@ -76,19 +76,19 @@ public final class WeaponSystem {
             double vy = Math.sin(rad) * weapon.getBulletSpeed();
 
             Entity bullet = EntityFactory.createBullet(
-                player.getX() + halfSize,
-                player.getY() + halfSize,
+                player.getX() + halfSize - GameConfig.BULLET_SIZE / 2.0,
+                player.getY() + halfSize - GameConfig.BULLET_SIZE / 2.0,
                 vx, vy,
                 weapon.getBulletDamage()
             );
             gameState.registerEntity(bullet);
 
-            // 创建子弹渲染节点
-            Circle bulletCircle = new Circle(GameConfig.BULLET_SIZE / 2, Color.ORANGE);
-            bulletCircle.setStroke(Color.YELLOW);
-            bulletCircle.setStrokeWidth(1);
-            FXGL.getGameScene().addUINode(bulletCircle);
-            renderNodes.put(bullet.getUuid(), bulletCircle);
+            // 创建子弹渲染节点（方块）
+            Rectangle bulletRect = new Rectangle(GameConfig.BULLET_SIZE, GameConfig.BULLET_SIZE, Color.ORANGE);
+            bulletRect.setStroke(Color.YELLOW);
+            bulletRect.setStrokeWidth(1);
+            FXGL.getGameScene().addUINode(bulletRect);
+            renderNodes.put(bullet.getUuid(), bulletRect);
         }
 
         FXGL.getEventBus().fireEvent(new Event(GameEvent.BULLET_FIRED_EVENT));

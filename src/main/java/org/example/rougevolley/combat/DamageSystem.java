@@ -40,7 +40,7 @@ public final class DamageSystem {
 
             double bulletX = bullet.getX();
             double bulletY = bullet.getY();
-            double bulletRadius = GameConfig.BULLET_SIZE / 2.0;
+            double bulletSize = GameConfig.BULLET_SIZE;
 
             for (Entity enemy : gameState.getEntities()) {
                 if (enemy == bullet || !enemy.isActive()) continue;
@@ -50,8 +50,8 @@ public final class DamageSystem {
                 EnemyComponent ec = enemy.getComponent(EnemyComponent.class).get();
                 double enemySize = ec.getSize();
 
-                // 圆形（子弹）vs AABB（敌人矩形，左上角 = position）
-                if (circleIntersectsRect(bulletX, bulletY, bulletRadius,
+                // 矩形 vs 矩形（子弹方块 vs 敌人方块，左上角 = position）
+                if (rectIntersectsRect(bulletX, bulletY, bulletSize, bulletSize,
                         enemy.getX(), enemy.getY(), enemySize, enemySize)) {
 
                     // ── 伤害结算 ──
@@ -80,26 +80,20 @@ public final class DamageSystem {
     }
 
     /**
-     * 圆形与轴对齐矩形碰撞检测
+     * 矩形与矩形碰撞检测（AABB vs AABB）
      *
-     * @param cx    圆心 X
-     * @param cy    圆心 Y
-     * @param r     圆半径
-     * @param rx    矩形左上角 X
-     * @param ry    矩形左上角 Y
-     * @param rw    矩形宽度
-     * @param rh    矩形高度
+     * @param x1 矩形1左上角X
+     * @param y1 矩形1左上角Y
+     * @param w1 矩形1宽度
+     * @param h1 矩形1高度
+     * @param x2 矩形2左上角X
+     * @param y2 矩形2左上角Y
+     * @param w2 矩形2宽度
+     * @param h2 矩形2高度
      * @return 是否相交
      */
-    private static boolean circleIntersectsRect(double cx, double cy, double r,
-                                                double rx, double ry, double rw, double rh) {
-        // 矩形上离圆心最近的点
-        double nearestX = Math.max(rx, Math.min(cx, rx + rw));
-        double nearestY = Math.max(ry, Math.min(cy, ry + rh));
-
-        double dx = cx - nearestX;
-        double dy = cy - nearestY;
-
-        return (dx * dx + dy * dy) <= (r * r);
+    private static boolean rectIntersectsRect(double x1, double y1, double w1, double h1,
+                                               double x2, double y2, double w2, double h2) {
+        return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
     }
 }
