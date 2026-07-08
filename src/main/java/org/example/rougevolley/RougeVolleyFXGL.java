@@ -2,6 +2,7 @@ package org.example.rougevolley;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
+import com.almasb.fxgl.core.math.Vec2;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
@@ -11,12 +12,16 @@ import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import org.example.rougevolley.config.GameConfig;
 import org.example.rougevolley.core.GameEvent;
 import org.example.rougevolley.core.GameState;
+import org.example.rougevolley.dungeon.Room;
+import org.example.rougevolley.dungeon.RoomPool;
+import org.example.rougevolley.dungeon.RoomTemplate;
+import org.example.rougevolley.dungeon.TileRenderer;
 import org.example.rougevolley.ecs.Entity;
 import org.example.rougevolley.ecs.components.*;
 import org.example.rougevolley.combat.DamageSystem;
@@ -55,6 +60,10 @@ public class RougeVolleyFXGL extends GameApplication {
 
     // ── 摄像机平滑 ──
     private double cameraX, cameraY;
+
+    // ── 地牢房间渲染 ──
+    private TileRenderer tileRenderer;
+    private Room startRoom;
 
     // ── FPS 跟踪 ──
     private int frameCount;
@@ -208,6 +217,11 @@ public class RougeVolleyFXGL extends GameApplication {
                 createRenderNodeFor(e);
             }
         }
+
+        // ── 构建 TileRenderer 并渲染房间地图 ──
+        tileRenderer = new TileRenderer();
+        tileRenderer.buildForRoom(startRoom);
+        log.info("TileRenderer built: " + tileRenderer.getTileCount() + " tiles");
 
         // ── 初始化摄像机位置 ──
         cameraX = clamp(player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0,
