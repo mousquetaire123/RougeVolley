@@ -86,6 +86,8 @@ public class Room {
             double absY = worldY + spawn.getY();
 
             Entity enemy = EntityFactory.createDefaultEnemy(absX, absY);
+            enemy.setUserData(this);            // 存储 Room 引用（AI 墙壁检测用）
+            enemy.addComponent(new SimpleEnemyAI()); // 添加 AI 行为
             gameState.registerEntity(enemy);
             enemyEntities.add(enemy);
         }

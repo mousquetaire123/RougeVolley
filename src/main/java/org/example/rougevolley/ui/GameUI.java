@@ -32,7 +32,7 @@ public class GameUI {
 
     private static final Logger log = Logger.get(GameUI.class);
 
-    private static final double HP_BAR_WIDTH = 220;
+    private static final double HP_BAR_WIDTH = GameConfig.VIEWPORT_WIDTH * 0.172;
     private static final double HP_BAR_HEIGHT = 18;
 
     private GameState gameState;
@@ -189,6 +189,7 @@ public class GameUI {
         upgradeVisible = true;
         upgradeOverlay.setVisible(true);
         gameState.setPaused(true);
+        FXGL.getEventBus().fireEvent(new Event(GameEvent.UPGRADE_TRIGGERED_EVENT));
         log.info("升级面板已显示，选项数: " + options.size());
     }
 

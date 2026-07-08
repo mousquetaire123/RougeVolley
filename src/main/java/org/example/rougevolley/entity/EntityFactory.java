@@ -68,6 +68,36 @@ public final class EntityFactory {
     }
 
     /**
+     * 创建精英敌人 — 更高血量、更快速度、更大体型。
+     */
+    public static Entity createEliteEnemy(double x, double y) {
+        Entity enemy = new Entity(new Point2D(x, y), EntityType.ENEMY_ELITE);
+        enemy.addComponent(new EnemyComponent(
+            GameConfig.ENEMY_SPEED * 1.5,
+            GameConfig.ENEMY_DETECTION_RADIUS * 1.2,
+            GameConfig.ENEMY_SIZE * 1.3
+        ));
+        enemy.addComponent(new HealthComponent(GameConfig.ENEMY_DEFAULT_HP * 2.0));
+        enemy.addComponent(new MovementComponent());
+        return enemy;
+    }
+
+    /**
+     * 创建 Boss 敌人 — 极高血量、较慢速度、大体型、更远检测距离。
+     */
+    public static Entity createBossEnemy(double x, double y) {
+        Entity enemy = new Entity(new Point2D(x, y), EntityType.ENEMY_BOSS);
+        enemy.addComponent(new EnemyComponent(
+            GameConfig.ENEMY_SPEED * 0.7,
+            GameConfig.ENEMY_DETECTION_RADIUS * 1.5,
+            GameConfig.ENEMY_SIZE * 1.7
+        ));
+        enemy.addComponent(new HealthComponent(GameConfig.ENEMY_DEFAULT_HP * 5.0));
+        enemy.addComponent(new MovementComponent());
+        return enemy;
+    }
+
+    /**
      * 创建子弹实体
      *
      * @param x      初始 X
@@ -100,7 +130,16 @@ public final class EntityFactory {
      * @param value 道具数值（如回复量）
      */
     public static Entity createPickup(double x, double y, String type, double value) {
-        Entity pickup = new Entity(new Point2D(x, y), EntityType.PICKUP);
+        // 根据数值自动分配稀有度
+        EntityType rarity;
+        if (value >= 50) {
+            rarity = EntityType.ITEM_LEGENDARY;
+        } else if (value >= 25) {
+            rarity = EntityType.ITEM_RARE;
+        } else {
+            rarity = EntityType.ITEM_COMMON;
+        }
+        Entity pickup = new Entity(new Point2D(x, y), rarity);
         pickup.addComponent(new PickupComponent(type, value));
         return pickup;
     }

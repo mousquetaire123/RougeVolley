@@ -89,11 +89,9 @@ public final class GameConfig {
     /** 视锥剔除边距 */
     public static final double CULL_MARGIN_NEG = -50;
 
-    // ── 测试 ──
-    /** 测试敌人数量 */
-    public static final int TEST_ENEMY_COUNT = 8;
-    /** 生成边距 (距世界边缘) */
-    public static final double SPAWN_MARGIN = 200;
-    /** 玩家周围安全半径 */
-    public static final double SPAWN_SAFE_RADIUS = 80;
+    // ── 敌人接触伤害 ──
+    /** 敌人接触玩家时造成的伤害 */
+    public static final double ENEMY_CONTACT_DAMAGE = 10.0;
+    /** 玩家受伤害后的无敌时间 (秒) */
+    public static final double INVINCIBILITY_DURATION = 1.0;
 }
