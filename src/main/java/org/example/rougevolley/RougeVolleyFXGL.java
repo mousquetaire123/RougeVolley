@@ -315,7 +315,26 @@ public class RougeVolleyFXGL extends GameApplication {
         playerRect.setStrokeWidth(1.5);
         FXGL.getGameScene().addUINode(playerRect);
         renderNodes.put(player.getUuid(), playerRect);
+    }
 
+    private void clearWorld() {
+        if (gameState != null) {
+            for (Entity e : new ArrayList<>(gameState.getEntities())) {
+                javafx.scene.Node node = renderNodes.remove(e.getUuid());
+                if (node != null) {
+                    FXGL.getGameScene().removeUINode(node);
+                }
+                e.destroy();
+            }
+            gameState.clearAllEntities();
+        }
+        renderNodes.clear();
+
+        if (tileRenderer != null) {
+            tileRenderer.clear();
+            tileRenderer = null;
+        }
+    }
         // ── 为起始房间已生成的敌人创建渲染节点 ──
         for (Entity e : gameState.getEntities()) {
             if (!renderNodes.containsKey(e.getUuid()) && e.isActive()) {
@@ -450,6 +469,8 @@ public class RougeVolleyFXGL extends GameApplication {
         cameraX += (targetX - cameraX) * lerpFactor;
         cameraY += (targetY - cameraY) * lerpFactor;
 
+        cameraX = clamp(cameraX, 0, GameConfig.WORLD_WIDTH - GameConfig.VIEWPORT_WIDTH);
+        cameraY = clamp(cameraY, 0, GameConfig.WORLD_HEIGHT - GameConfig.VIEWPORT_HEIGHT);
         // 限制在动态世界边界内（由地牢房间包围盒计算）
         double boundRight = Math.max(worldMaxX - GameConfig.VIEWPORT_WIDTH, worldMinX);
         double boundBottom = Math.max(worldMaxY - GameConfig.VIEWPORT_HEIGHT, worldMinY);
@@ -463,6 +484,8 @@ public class RougeVolleyFXGL extends GameApplication {
         FXGL.getGameScene().getViewport().setX(cameraX);
         FXGL.getGameScene().getViewport().setY(cameraY);
     }
+
+    // ── 渲染同步 ──
 
     // ============================================================
     //  门碰撞检测与房间切换 (Problem 5.2)
