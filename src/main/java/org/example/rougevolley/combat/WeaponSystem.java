@@ -4,6 +4,8 @@ import com.almasb.fxgl.dsl.FXGL;
 import javafx.event.Event;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.example.rougevolley.config.GameConfig;
@@ -28,6 +30,9 @@ import java.util.Map;
 public final class WeaponSystem {
 
     private WeaponSystem() {}
+
+    /** 子弹纹理（16×16像素，延迟加载） */
+    private static Image bulletTexture;
 
     /**
      * 尝试发射武器（受冷却时间限制）
@@ -86,12 +91,28 @@ public final class WeaponSystem {
             );
             gameState.registerEntity(bullet);
 
-            // 创建子弹渲染节点（方块）
-            Rectangle bulletRect = new Rectangle(GameConfig.BULLET_SIZE, GameConfig.BULLET_SIZE, Color.ORANGE);
-            bulletRect.setStroke(Color.YELLOW);
-            bulletRect.setStrokeWidth(1);
-            FXGL.getGameScene().addUINode(bulletRect);
-            renderNodes.put(bullet.getUuid(), bulletRect);
+            // 创建子弹渲染节点（精灵图或回退方块）
+            Node bulletNode;
+            if (bulletTexture == null) {
+                var resourceUrl = WeaponSystem.class.getResource("/assets/textures/bullet.png");
+                if (resourceUrl != null) {
+                    bulletTexture = new Image(resourceUrl.toExternalForm());
+                }
+            }
+            if (bulletTexture != null && !bulletTexture.isError()) {
+                ImageView bulletView = new ImageView(bulletTexture);
+                bulletView.setFitWidth(32);
+                bulletView.setFitHeight(32);
+                bulletView.setSmooth(false);
+                bulletNode = bulletView;
+            } else {
+                Rectangle bulletRect = new Rectangle(GameConfig.BULLET_SIZE, GameConfig.BULLET_SIZE, Color.ORANGE);
+                bulletRect.setStroke(Color.YELLOW);
+                bulletRect.setStrokeWidth(1);
+                bulletNode = bulletRect;
+            }
+            FXGL.getGameScene().addUINode(bulletNode);
+            renderNodes.put(bullet.getUuid(), bulletNode);
         }
 
         FXGL.getEventBus().fireEvent(new Event(GameEvent.BULLET_FIRED_EVENT));

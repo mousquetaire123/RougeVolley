@@ -10,6 +10,8 @@ import javafx.event.Event;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -61,6 +63,8 @@ public class RougeVolleyFXGL extends GameApplication {
 
     private Text debugText;
 
+    private Image playerTexture;
+    private Image undeadTexture;
     private boolean gameStarted;
     private boolean hadEnemies;
     private boolean upgradeTriggeredThisWave;
@@ -355,16 +359,36 @@ public class RougeVolleyFXGL extends GameApplication {
         gameState.setPlayer(player);
         gameState.registerEntity(player);
 
-        Rectangle playerRect = new Rectangle(
-            GameConfig.PLAYER_SIZE, GameConfig.PLAYER_SIZE,
-            Color.DODGERBLUE
-        );
-        playerRect.setArcWidth(6);
-        playerRect.setArcHeight(6);
-        playerRect.setStroke(Color.WHITE);
-        playerRect.setStrokeWidth(1.5);
-        FXGL.getGameScene().addUINode(playerRect);
-        renderNodes.put(player.getUuid(), playerRect);
+        // 加载玩家精灵纹理（16×16像素，放大至PLAYER_SIZE显示）
+        if (playerTexture == null) {
+            var resourceUrl = RougeVolleyFXGL.class.getResource("/assets/textures/player.png");
+            if (resourceUrl != null) {
+                playerTexture = new Image(resourceUrl.toExternalForm());
+            } else {
+                log.warning("Player texture not found at /assets/textures/player.png");
+            }
+        }
+        javafx.scene.Node playerNode;
+        if (playerTexture != null && !playerTexture.isError()) {
+            ImageView playerView = new ImageView(playerTexture);
+            playerView.setFitWidth(GameConfig.PLAYER_SIZE);
+            playerView.setFitHeight(GameConfig.PLAYER_SIZE);
+            playerView.setSmooth(false); // 像素艺术使用最近邻插值
+            playerNode = playerView;
+        } else {
+            // 回退：纹理未加载时使用蓝色矩形
+            Rectangle fallbackRect = new Rectangle(
+                GameConfig.PLAYER_SIZE, GameConfig.PLAYER_SIZE,
+                Color.DODGERBLUE
+            );
+            fallbackRect.setArcWidth(6);
+            fallbackRect.setArcHeight(6);
+            fallbackRect.setStroke(Color.WHITE);
+            fallbackRect.setStrokeWidth(1.5);
+            playerNode = fallbackRect;
+        }
+        FXGL.getGameScene().addUINode(playerNode);
+        renderNodes.put(player.getUuid(), playerNode);
 
         // ── 为起始房间已生成的敌人创建渲染节点 ──
         for (Entity e : gameState.getEntities()) {
@@ -705,14 +729,31 @@ public class RougeVolleyFXGL extends GameApplication {
     private void createRenderNodeFor(Entity e) {
         var enemyComp = e.getComponent(EnemyComponent.class);
         if (enemyComp.isPresent()) {
-            double size = enemyComp.get().getSize();
-            Rectangle rect = new Rectangle(size, size, Color.CRIMSON);
-            rect.setArcWidth(4);
-            rect.setArcHeight(4);
-            rect.setStroke(Color.DARKRED);
-            rect.setStrokeWidth(1);
-            FXGL.getGameScene().addUINode(rect);
-            renderNodes.put(e.getUuid(), rect);
+            // 加载亡灵纹理（16×16→32×32）
+            if (undeadTexture == null) {
+                var resourceUrl = RougeVolleyFXGL.class.getResource("/assets/textures/undead.png");
+                if (resourceUrl != null) {
+                    undeadTexture = new Image(resourceUrl.toExternalForm());
+                }
+            }
+            javafx.scene.Node node;
+            if (undeadTexture != null && !undeadTexture.isError()) {
+                ImageView enemyView = new ImageView(undeadTexture);
+                enemyView.setFitWidth(enemyComp.get().getSize());
+                enemyView.setFitHeight(enemyComp.get().getSize());
+                enemyView.setSmooth(false);
+                node = enemyView;
+            } else {
+                double size = enemyComp.get().getSize();
+                Rectangle rect = new Rectangle(size, size, Color.CRIMSON);
+                rect.setArcWidth(4);
+                rect.setArcHeight(4);
+                rect.setStroke(Color.DARKRED);
+                rect.setStrokeWidth(1);
+                node = rect;
+            }
+            FXGL.getGameScene().addUINode(node);
+            renderNodes.put(e.getUuid(), node);
         }
     }
 
@@ -754,13 +795,7 @@ public class RougeVolleyFXGL extends GameApplication {
             if (!renderNodes.containsKey(e.getUuid())
                 && e.hasComponent(EnemyComponent.class)
                 && e.isActive()) {
-                Rectangle rect = new Rectangle(GameConfig.ENEMY_SIZE, GameConfig.ENEMY_SIZE, Color.CRIMSON);
-                rect.setArcWidth(4);
-                rect.setArcHeight(4);
-                rect.setStroke(Color.DARKRED);
-                rect.setStrokeWidth(1);
-                FXGL.getGameScene().addUINode(rect);
-                renderNodes.put(e.getUuid(), rect);
+                createRenderNodeFor(e);
             }
         }
         if (gameState.getEntities().stream().anyMatch(e -> e.isActive() && e.hasComponent(EnemyComponent.class))) {

@@ -1,0 +1,458 @@
+22:38:36.102 [main                     ] DEBUG Logger               - Configured Logger
+22:38:36.124 [main                     ] DEBUG GameApplication      - Logging settings
+Title: RougeVolley — 地牢探险
+Version: 0.1.0
+Width: 1280
+Height: 720
+Fullscreen: false
+Intro: false
+Profiling: false
+Single step:false
+App Mode: DEVELOPER
+Menu Key: ESCAPE
+Stage Style: DECORATED
+Scene Factory: class com.almasb.fxgl.app.scene.SceneFactory
+
+22:38:36.521 [JavaFX Application Thread] DEBUG FXGLApplication      - Initializing FXGL
+22:38:36.525 [JavaFX Application Thread] INFO  Engine               - FXGL-21.1 (27.03.2024 07.52) on WINDOWS (J:21.0.11 FX:21)
+22:38:36.525 [JavaFX Application Thread] DEBUG Engine               - JRE Vendor Name: Microsoft
+22:38:36.526 [JavaFX Application Thread] DEBUG Engine               - Running on OS: Windows 11 version 10.0
+22:38:36.526 [JavaFX Application Thread] DEBUG Engine               - Architecture: amd64
+22:38:36.526 [JavaFX Application Thread] INFO  Engine               - Source code and latest versions at: https://github.com/AlmasB/FXGL
+22:38:36.526 [JavaFX Application Thread] INFO  Engine               -       Ask questions and discuss at: https://github.com/AlmasB/FXGL/discussions
+22:38:36.526 [JavaFX Application Thread] INFO  Engine               -              Join the FXGL chat at: https://gitter.im/AlmasB/FXGL
+22:38:36.627 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Creating a JavaFX scene
+22:38:36.672 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Target settings size: 1280.0 x 720.0
+22:38:36.672 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled scene size:    1280.0 x 720.0
+22:38:36.672 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled ratio: (1.0, 1.0)
+22:38:36.673 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Set initial scene to FXGLStartupScene
+22:38:36.677 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Opening main window
+22:38:36.757 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Window border size: (14.4000244140625, 37.5999755859375)
+22:38:36.757 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled size: 1280.0 x 720.0
+22:38:36.757 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled ratio: (1.0, 1.0)
+22:38:36.757 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scene size: 1280.0 x 720.0
+22:38:36.758 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Stage size: 1294.4000244140625 x 757.5999755859375
+22:38:36.764 [FXGL Background Thread 1 ] DEBUG Engine               - Initializing environment variables
+22:38:36.815 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - User app class for loading assets: class org.example.rougevolley.RougeVolleyFXGL
+22:38:36.815 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Applying CSS: fxgl_dark.css
+22:38:36.816 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/hzyyz/.m2/repository/com/github/almasb/fxgl/21.1/fxgl-21.1.jar!/fxglassets/ui/css/fxgl_dark.css
+22:38:36.851 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Initializing application scenes
+22:38:36.922 [FXGL Background Thread 1 ] DEBUG GameWorld            - Game world initialized
+22:38:36.976 [FXGL Background Thread 1 ] DEBUG PhysicsWorld         - Physics world initialized: appHeight=720, physics.ppm=50.0
+22:38:36.976 [FXGL Background Thread 1 ] DEBUG PhysicsWorld         - Using strategy: BRUTE_FORCE
+22:38:36.980 [FXGL Background Thread 1 ] DEBUG GameScene            - Game scene initialized: 1280x720
+22:38:36.980 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Application scenes initialized
+22:38:37.001 [FXGL Background Thread 1 ] DEBUG SystemBundleService  - Loading FXGL system data
+22:38:37.004 [FXGL Background Thread 1 ] DEBUG FileSystemAccess     - Reading from: C:\Users\hzyyz\IdeaProjects\RougeVolley\system\fxgl.bundle
+22:38:37.013 [FXGL Background Thread 1 ] DEBUG SystemBundleService  - Bundle FXGL: {}
+22:38:37.013 [FXGL Background Thread 1 ] DEBUG UpdaterService       - Checking for updates
+22:38:37.017 [FXGL Background Thread 4 ] DEBUG FXGLApplication      - Loading fonts
+22:38:37.018 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/hzyyz/.m2/repository/com/github/almasb/fxgl/21.1/fxgl-21.1.jar!/fxglassets/ui/fonts/VarelaRound-Regular.ttf
+22:38:37.018 [FXGL Background Thread 1 ] DEBUG FXGLApplication      - Loading default localization
+22:38:37.019 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/hzyyz/.m2/repository/com/github/almasb/fxgl/21.1/fxgl-21.1.jar!/fxglassets/languages/english.lang
+22:38:37.041 [FXGL Background Thread 1 ] INFO  FXGLApplication      - FXGL initialization took: 0.278 sec
+22:38:37.049 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/hzyyz/.m2/repository/com/github/almasb/fxgl/21.1/fxgl-21.1.jar!/fxglassets/ui/fonts/Abel-Regular.ttf
+22:38:37.051 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Move Up - W
+22:38:37.051 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Move Up Arrow - Up
+22:38:37.052 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Move Down - S
+22:38:37.052 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Move Down Arrow - Down
+22:38:37.052 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/hzyyz/.m2/repository/com/github/almasb/fxgl/21.1/fxgl-21.1.jar!/fxglassets/ui/fonts/TerminalLandMono-Regular.otf
+22:38:37.052 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Move Left - A
+22:38:37.052 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Move Left Arrow - Left
+22:38:37.052 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Move Right - D
+22:38:37.052 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Move Right Arrow - Right
+22:38:37.055 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Fire - LMB
+22:38:37.056 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Pause - Esc
+22:38:37.056 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/hzyyz/.m2/repository/com/github/almasb/fxgl/21.1/fxgl-21.1.jar!/fxglassets/ui/fonts/Courier-Prime.ttf
+22:38:37.056 [JavaFX Application Thread] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/hzyyz/.m2/repository/com/github/almasb/fxgl/21.1/fxgl-21.1.jar!/fxglassets/textures/fxgl_icon.png
+22:38:37.103 [JavaFX Application Thread] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/hzyyz/.m2/repository/com/github/almasb/fxgl/21.1/fxgl-21.1.jar!/fxglassets/textures/fxgl_default_cursor.png
+22:38:37.106 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Screenshot - CTRL+8
+22:38:37.107 [JavaFX Application Thread] DEBUG Input                - Registered new binding: System info dump - CTRL+9
+22:38:37.107 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Restart - CTRL+R
+22:38:37.108 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Toggle Debug Camera - CTRL+7
+22:38:37.114 [JavaFX Application Thread] DEBUG LoopRunner           - Starting loop
+22:38:37.114 [JavaFX Application Thread] DEBUG LoopRunner           - Initializing JavaFX AnimationTimerLoop
+22:38:37.119 [JavaFX Application Thread] DEBUG GameApplicationServi - Starting new game
+22:38:37.119 [JavaFX Application Thread] DEBUG Input                - Clearing active input actions
+22:38:37.130 [JavaFX Application Thread] DEBUG GameApplicationServi - Removing overlay from FXGLStartupScene and adding to FXGLLoadingScene
+22:38:37.131 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - FXGLStartupScene -> FXGLLoadingScene
+22:38:37.131 [JavaFX Application Thread] DEBUG GameApplicationServi - Clearing previous game
+22:38:37.131 [JavaFX Application Thread] DEBUG GameScene            - Clearing game scene
+22:38:37.131 [JavaFX Application Thread] DEBUG GameWorld            - Clearing game world
+22:38:37.131 [JavaFX Application Thread] DEBUG PhysicsWorld         - Clearing physics world
+22:38:37.133 [FXGL Background Thread 4 ] DEBUG FXGLApplication      - Initializing game
+22:38:37.134 [JavaFX Application Thread] DEBUG FXGLApplication      - Registering font factories with UI factory
+22:38:37.136 [FXGL Background Thread 4 ] INFO  RougeVolleyFXGL      - RougeVolley initializing... seed=-7368835888650095051
+22:38:37.156 [FXGL Background Thread 4 ] INFO  UpgradeManager       - 已加载 5 个升级选项
+22:38:37.181 [FXGL Background Thread 4 ] INFO  RougeVolleyFXGL      - RougeVolley initialized. Waiting for player to start.
+22:38:37.182 [FXGL Background Thread 4 ] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:37.183 [FXGL Background Thread 4 ] INFO  FXGLApplication      - Game initialization took: 0.050 sec
+22:38:37.203 [JavaFX Application Thread] DEBUG Input                - Clearing active input actions
+22:38:37.215 [JavaFX Application Thread] DEBUG GameApplicationServi - Removing overlay from FXGLLoadingScene and adding to GameScene
+22:38:37.216 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - FXGLLoadingScene -> GameScene
+22:38:38.035 [JavaFX Application Thread] INFO  UpgradeManager       - 已加载 5 个升级选项
+22:38:38.035 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.083 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.087 [JavaFX Application Thread] INFO  RougeVolleyFXGL      - RougeVolley initialized. Dungeon: 6 rooms. Player at (320.0, 256.0)
+22:38:38.087 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.088 [JavaFX Application Thread] INFO  RougeVolleyFXGL      - New game started. Player at (320.0, 256.0)
+22:38:38.765 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.775 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.796 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.802 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.807 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.813 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.817 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.824 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.829 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.834 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.840 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.845 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.852 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.859 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.861 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.870 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.877 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.882 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.889 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.893 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.901 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.906 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.912 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.918 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.925 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.931 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.937 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.941 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.950 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.956 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.961 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.968 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.973 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.980 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.986 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.989 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:38.998 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.004 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.010 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.016 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.021 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.029 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.035 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.037 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.046 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.052 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.058 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.064 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.069 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.076 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.082 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.084 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.094 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.101 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.107 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.113 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.116 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.125 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.131 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.133 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.143 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.149 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.156 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.336 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.341 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.349 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.356 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.361 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.367 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.372 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.380 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.386 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.389 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.398 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.404 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.410 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.417 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.420 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.428 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.434 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.437 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.446 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.453 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.458 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.464 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.468 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.701 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.706 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.708 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.719 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.725 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.730 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.737 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.741 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.750 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.755 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.757 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.767 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.772 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.779 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.785 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.789 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.798 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.804 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.810 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.816 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.820 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.828 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.834 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.837 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.846 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:39.969 [FXGL Background Thread 2 ] INFO  UpdaterService       - Your current version:  21.1
+22:38:39.970 [FXGL Background Thread 2 ] INFO  UpdaterService       - Latest stable version: 25
+22:38:40.016 [FXGL Background Thread 3 ] DEBUG Engine               - Logging environment variables
+22:38:40.016 [FXGL Background Thread 3 ] DEBUG Engine               - achievements: []
+22:38:40.016 [FXGL Background Thread 3 ] DEBUG Engine               - actualHeight: 720.0
+22:38:40.016 [FXGL Background Thread 3 ] DEBUG Engine               - actualHeightProperty: ReadOnlyDoubleProperty [value: 720.0]
+22:38:40.017 [FXGL Background Thread 3 ] DEBUG Engine               - actualWidth: 1280.0
+22:38:40.017 [FXGL Background Thread 3 ] DEBUG Engine               - actualWidthProperty: ReadOnlyDoubleProperty [value: 1280.0]
+22:38:40.017 [FXGL Background Thread 3 ] DEBUG Engine               - appIcon: fxgl_icon.png
+22:38:40.017 [FXGL Background Thread 3 ] DEBUG Engine               - applicationMode: DEVELOPER
+22:38:40.017 [FXGL Background Thread 3 ] DEBUG Engine               - cSSList: [fxgl_dark.css]
+22:38:40.018 [FXGL Background Thread 3 ] DEBUG Engine               - collisionDetectionStrategy: BRUTE_FORCE
+22:38:40.018 [FXGL Background Thread 3 ] DEBUG Engine               - configClass: Optional.empty
+22:38:40.018 [FXGL Background Thread 3 ] DEBUG Engine               - credits: []
+22:38:40.019 [FXGL Background Thread 3 ] DEBUG Engine               - defaultCursor: CursorInfo(imageName=fxgl_default_cursor.png, hotspotX=7.0, hotspotY=6.0)
+22:38:40.019 [FXGL Background Thread 3 ] DEBUG Engine               - devBBoxColorProperty: ObjectProperty [value: 0xff0000ff]
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - devEnableDebugCameraProperty: BooleanProperty [value: false]
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - devSensorColorProperty: ObjectProperty [value: 0xffff00ff]
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - devShowBBoxProperty: BooleanProperty [value: false]
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - devShowPositionProperty: BooleanProperty [value: false]
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - enabledMenuItems: []
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - engineServices: [class com.almasb.fxgl.app.services.FXGLAssetLoaderService, class com.almasb.fxgl.app.FXGLApplication$GameApplicationService, class com.almasb.fxgl.app.services.FXGLDialogService, class com.almasb.fxgl.app.services.IOTaskExecutorService, class com.almasb.fxgl.io.FileSystemService, class com.almasb.fxgl.localization.LocalizationService, class com.almasb.fxgl.app.services.SystemBundleService, class com.almasb.fxgl.profile.SaveLoadService, class com.almasb.fxgl.ui.FXGLUIFactoryServiceProvider, class com.almasb.fxgl.ui.FXGLDialogFactoryServiceProvider, class com.almasb.fxgl.audio.AudioPlayer, class com.almasb.fxgl.notification.impl.NotificationServiceProvider, class com.almasb.fxgl.achievement.AchievementService, class com.almasb.fxgl.cutscene.CutsceneService, class com.almasb.fxgl.minigames.MiniGameService, class com.almasb.fxgl.net.NetService, class com.almasb.fxgl.app.services.UpdaterService, class com.almasb.fxgl.dev.DevService]
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - fontGame: Abel-Regular.ttf
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - fontMono: TerminalLandMono-Regular.otf
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - fontSizeScaleUI: 1.0
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - fontText: Courier-Prime.ttf
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - fontUI: VarelaRound-Regular.ttf
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - fullScreen: BooleanProperty [value: false]
+22:38:40.020 [FXGL Background Thread 3 ] DEBUG Engine               - gameDifficulty: MEDIUM
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - gameDifficultyProperty: ObjectProperty [value: MEDIUM]
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - globalMusicVolume: 0.5
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - globalMusicVolumeProperty: DoubleProperty [value: 0.5]
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - globalSoundVolume: 0.5
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - globalSoundVolumeProperty: DoubleProperty [value: 0.5]
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - height: 720
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - is3D: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isAndroid: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isBrowser: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isClickFeedbackEnabled: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isCloseConfirmation: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isDesktop: true
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isDeveloperMenuEnabled: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isEmbedded: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isEntityPreloadEnabled: true
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isExperimentalTiledLargeMap: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isFileSystemWriteAllowed: true
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isFullScreenAllowed: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isFullScreenFromStart: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isGameMenuEnabled: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isIOS: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isIntroEnabled: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isLinux: false
+22:38:40.021 [FXGL Background Thread 3 ] DEBUG Engine               - isMac: false
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isMainMenuEnabled: false
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isManualResizeEnabled: false
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isMobile: false
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isNative: false
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isPauseMusicWhenMinimized: true
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isPreserveResizeRatio: true
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isProfilingEnabled: false
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isScaleAffectedOnResize: true
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isSingleStep: false
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isUserProfileEnabled: false
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - isWindows: true
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - language: ObjectProperty [value: ENGLISH]
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - menuKey: ESCAPE
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - mouseSensitivity: 0.2
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - notificationViewClass: class com.almasb.fxgl.notification.view.XboxNotificationView
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - pixelsPerMeter: 50.0
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - platform: WINDOWS
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - prefHeightProperty: ReadOnlyDoubleProperty [value: 720.0]
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - prefWidthProperty: ReadOnlyDoubleProperty [value: 1280.0]
+22:38:40.022 [FXGL Background Thread 3 ] DEBUG Engine               - profileDir: profiles/
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - profileName: StringProperty [value: DEFAULT]
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - randomSeed: -1
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - runtimeInfo: RuntimeInfo(platform=WINDOWS, version=21.1, build=27.03.2024 07.52)
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - saveFileExt: sav
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - scaledHeightProp$fxgl: DoubleProperty [bound, value: 720.0]
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - scaledWidthProp$fxgl: DoubleProperty [bound, value: 1280.0]
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - sceneFactory: com.almasb.fxgl.app.scene.SceneFactory@66f9214e
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - secondsIn24h: 60
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - soundMenuBack: menu/back.wav
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - soundMenuPress: menu/press.wav
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - soundMenuSelect: menu/select.wav
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - soundNotification: core/notification.wav
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - stageStyle: DECORATED
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - supportedLanguages: [ENGLISH, FRENCH, GERMAN, HUNGARIAN, RUSSIAN]
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - ticksPerSecond: -1
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - title: RougeVolley — 地牢探险
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - urlGithub: https://github.com/AlmasB/FXGL
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - urlLeaderboard: http://fxgl-top.herokuapp.com/
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - urlPOM: https://raw.githubusercontent.com/AlmasB/FXGL/release/README.md
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - userAppClass: class org.example.rougevolley.RougeVolleyFXGL
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - version: 0.1.0
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - versionCheckDays: 7
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - width: 1280
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - Logging services
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.app.services.FXGLAssetLoaderService
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.app.FXGLApplication$GameApplicationService
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.app.services.FXGLDialogService
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.app.services.IOTaskExecutorService
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.io.FileSystemService
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.localization.LocalizationService
+22:38:40.024 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.app.services.SystemBundleService
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.profile.SaveLoadService
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.ui.FXGLUIFactoryServiceProvider
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.ui.FXGLDialogFactoryServiceProvider
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.audio.AudioPlayer
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.notification.impl.NotificationServiceProvider
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.achievement.AchievementService
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.cutscene.CutsceneService
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.minigames.MiniGameService
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.net.NetService
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.app.services.UpdaterService
+22:38:40.025 [FXGL Background Thread 3 ] DEBUG Engine               - class com.almasb.fxgl.dev.DevService
+22:38:40.070 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.076 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.083 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.089 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.093 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.100 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.107 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.109 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.119 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.125 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.131 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.137 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.140 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.150 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.155 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.157 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.167 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.172 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.180 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.186 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.189 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.198 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.203 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.210 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.216 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.221 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.228 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.234 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.237 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.246 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.252 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.258 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.264 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.269 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.276 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.283 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.285 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.295 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.300 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.307 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.313 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.316 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.325 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.585 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.589 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.598 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.603 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.605 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.616 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.620 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.628 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.634 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.637 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.647 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.652 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.658 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.664 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.668 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.677 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.682 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.685 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.695 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.700 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.707 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.713 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.716 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.725 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.731 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.733 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.743 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.749 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.755 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.761 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.765 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.773 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.779 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.786 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.792 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.797 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.804 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.810 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.813 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.822 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.828 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.829 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:40.840 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.052 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.053 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.064 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.068 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.076 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.081 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.085 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.094 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.100 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.107 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.113 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.117 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.125 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.130 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.133 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.143 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.148 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.155 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.350 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.355 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.357 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.367 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.373 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.379 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.385 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.389 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.397 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.404 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.405 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.415 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.421 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.828 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.834 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.837 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.845 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.852 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.853 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.864 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.874 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.883 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:41.890 [JavaFX Application Thread] DEBUG EventBus             - Firing event: javafx.event.Event[source=javafx.event.Event$$Lambda/0x000001d78117ae78@3d8ded]
+22:38:44.226 [JavaFX Application Thread] DEBUG FXGLApplication      - Exiting FXGL
+22:38:44.226 [JavaFX Application Thread] DEBUG LoopRunner           - Stopping loop
+22:38:44.226 [JavaFX Application Thread] DEBUG SystemBundleService  - Saving FXGL system data
+22:38:44.228 [JavaFX Application Thread] DEBUG FileSystemAccess     - Writing to: C:\Users\hzyyz\IdeaProjects\RougeVolley\system\fxgl.bundle
+22:38:44.231 [JavaFX Application Thread] DEBUG Async                - Shutting down background threads
+22:38:44.231 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Closing main window
+22:38:44.247 [JavaFX Application Thread] DEBUG Logger               - Closing Logger

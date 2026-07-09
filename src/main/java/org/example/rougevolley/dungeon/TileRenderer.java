@@ -3,6 +3,8 @@ package org.example.rougevolley.dungeon;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.core.math.Vec2;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.example.rougevolley.config.GameConfig;
@@ -41,6 +43,15 @@ public class TileRenderer {
     private final List<TileEntry> tileEntries = new ArrayList<>();
     private Room currentRoom;
     private boolean visible = true;
+
+    /** 门纹理（16×16→32×32，延迟加载） */
+    private static Image doorTexture;
+
+    /** 地板纹理（16×16→32×32，延迟加载） */
+    private static Image floorTexture;
+
+    /** 墙壁纹理（16×16→32×32，延迟加载） */
+    private static Image wallTexture;
 
     // ── 调色板（高对比度地牢风格） ──
     private static final Color COLOR_FLOOR        = Color.rgb(105, 95, 82);
@@ -103,33 +114,82 @@ public class TileRenderer {
 
                 // --- 地板 ---
                 if (ground[row][col] == RoomTemplate.GID_FLOOR) {
-                    Rectangle floor = new Rectangle(T, T, floorColor);
-                    floor.setStroke(COLOR_FLOOR_STROKE);
-                    floor.setStrokeWidth(0.5);
-                    addTile(floor, tileWorldX, tileWorldY);
+                    if (floorTexture == null) {
+                        var resourceUrl = TileRenderer.class.getResource("/assets/textures/floor.png");
+                        if (resourceUrl != null) {
+                            floorTexture = new Image(resourceUrl.toExternalForm());
+                        }
+                    }
+                    Node floorNode;
+                    if (floorTexture != null && !floorTexture.isError()) {
+                        ImageView floorView = new ImageView(floorTexture);
+                        floorView.setFitWidth(T);
+                        floorView.setFitHeight(T);
+                        floorView.setSmooth(false);
+                        floorNode = floorView;
+                    } else {
+                        Rectangle floor = new Rectangle(T, T, floorColor);
+                        floor.setStroke(COLOR_FLOOR_STROKE);
+                        floor.setStrokeWidth(0.5);
+                        floorNode = floor;
+                    }
+                    addTile(floorNode, tileWorldX, tileWorldY);
                 }
 
                 // --- 墙壁 ---
                 if (walls[row][col] == RoomTemplate.GID_WALL) {
-                    Rectangle wall = new Rectangle(T, T, COLOR_WALL);
-                    wall.setStroke(COLOR_WALL_BORDER);
-                    wall.setStrokeWidth(WALL_STROKE);
-                    addTile(wall, tileWorldX, tileWorldY);
+                    if (wallTexture == null) {
+                        var resourceUrl = TileRenderer.class.getResource("/assets/textures/wall.png");
+                        if (resourceUrl != null) {
+                            wallTexture = new Image(resourceUrl.toExternalForm());
+                        }
+                    }
+                    Node wallNode;
+                    if (wallTexture != null && !wallTexture.isError()) {
+                        ImageView wallView = new ImageView(wallTexture);
+                        wallView.setFitWidth(T);
+                        wallView.setFitHeight(T);
+                        wallView.setSmooth(false);
+                        wallNode = wallView;
+                    } else {
+                        Rectangle wall = new Rectangle(T, T, COLOR_WALL);
+                        wall.setStroke(COLOR_WALL_BORDER);
+                        wall.setStrokeWidth(WALL_STROKE);
+                        wallNode = wall;
+                    }
+                    addTile(wallNode, tileWorldX, tileWorldY);
                 }
             }
         }
 
-        // --- 门标记（高亮通道） ---
+        // --- 门（使用精灵纹理） ---
+        if (doorTexture == null) {
+            var resourceUrl = TileRenderer.class.getResource("/assets/textures/door.png");
+            if (resourceUrl != null) {
+                doorTexture = new Image(resourceUrl.toExternalForm());
+            }
+        }
         for (RoomTemplate.DoorDef door : template.getDoors()) {
             double doorWorldX = baseX + door.x;
             double doorWorldY = baseY + door.y;
-            Rectangle doorRect = new Rectangle(door.width, door.height, COLOR_DOOR);
-            doorRect.setOpacity(0.75);
-            doorRect.setStroke(COLOR_DOOR_STROKE);
-            doorRect.setStrokeWidth(2.5);
-            doorRect.setArcWidth(4);
-            doorRect.setArcHeight(4);
-            addTile(doorRect, doorWorldX, doorWorldY);
+            Node doorNode;
+            if (doorTexture != null && !doorTexture.isError()) {
+                ImageView doorView = new ImageView(doorTexture);
+                doorView.setFitWidth(door.width);
+                doorView.setFitHeight(door.height);
+                doorView.setSmooth(false);
+                doorView.setOpacity(0.9);
+                doorNode = doorView;
+            } else {
+                Rectangle doorRect = new Rectangle(door.width, door.height, COLOR_DOOR);
+                doorRect.setOpacity(0.75);
+                doorRect.setStroke(COLOR_DOOR_STROKE);
+                doorRect.setStrokeWidth(2.5);
+                doorRect.setArcWidth(4);
+                doorRect.setArcHeight(4);
+                doorNode = doorRect;
+            }
+            addTile(doorNode, doorWorldX, doorWorldY);
         }
 
         // 所有节点默认隐藏，由 sync() 控制可见性
