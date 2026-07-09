@@ -41,6 +41,9 @@ public class RoomPool {
         try {
             List<RoomTemplate> loaded = RoomTemplate.loadAllFromJsonFile("data/RoomTemplates.json");
             if (!loaded.isEmpty()) {
+                System.getLogger(RoomPool.class.getName()).log(
+                    System.Logger.Level.INFO,
+                    "Loaded " + loaded.size() + " room templates from RoomTemplates.json");
                 return new RoomPool(loaded, rng);
             }
         } catch (Exception e) {
@@ -50,7 +53,11 @@ public class RoomPool {
         }
 
         // 回退：使用内建模板
-        return new RoomPool(RoomTemplate.buildDefaultTemplates(), rng);
+        List<RoomTemplate> builtin = RoomTemplate.buildDefaultTemplates();
+        System.getLogger(RoomPool.class.getName()).log(
+            System.Logger.Level.INFO,
+            "Using " + builtin.size() + " built-in room templates as fallback");
+        return new RoomPool(builtin, rng);
     }
 
     /**

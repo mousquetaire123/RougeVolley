@@ -402,8 +402,7 @@ public class RoomTemplate {
         return new RoomTemplate("room_crossroad", "十字路口",
             W, H, T, T, ground, walls, doors,
             new Point2D(10 * T, 8 * T),
-            List.of(new Point2D(3 * T, 3 * T), new Point2D(16 * T, 3 * T),
-                    new Point2D(3 * T, 11 * T), new Point2D(16 * T, 11 * T)));
+            List.of() /* 十字路口不刷怪 */);
     }
 
     // ── 2. 横走廊 ──
@@ -431,7 +430,7 @@ public class RoomTemplate {
         return new RoomTemplate("room_corridor_h", "横走廊",
             W, H, T, T, ground, walls, doors,
             new Point2D(10 * T, 7 * T),
-            List.of(new Point2D(5 * T, 7 * T), new Point2D(14 * T, 7 * T)));
+            List.of() /* 横走廊不刷怪 */);
     }
 
     // ── 3. 竖走廊 ──
@@ -459,7 +458,7 @@ public class RoomTemplate {
         return new RoomTemplate("room_corridor_v", "竖走廊",
             W, H, T, T, ground, walls, doors,
             new Point2D(10 * T, 7 * T),
-            List.of(new Point2D(10 * T, 3 * T), new Point2D(10 * T, 11 * T)));
+            List.of() /* 竖走廊不刷怪 */);
     }
 
     // ── 4. L 型房间 ──
@@ -651,14 +650,14 @@ public class RoomTemplate {
     }
 
     private static String readResource(String path) {
-        // 先尝试 assets/ 下，再尝试直接用 classpath
-        String fullPath = path.startsWith("/") ? path : "/assets/" + path;
-        InputStream is = RoomTemplate.class.getResourceAsStream(fullPath);
-        if (is == null) {
-            is = RoomTemplate.class.getResourceAsStream("/" + path);
-        }
+        // 按优先级尝试多个路径：直接 classpath → classloader → assets 回退
+        String directPath = path.startsWith("/") ? path : "/" + path;
+        InputStream is = RoomTemplate.class.getResourceAsStream(directPath);
         if (is == null) {
             is = RoomTemplate.class.getClassLoader().getResourceAsStream(path);
+        }
+        if (is == null) {
+            is = RoomTemplate.class.getResourceAsStream("/assets/" + path);
         }
         if (is == null) return null;
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {

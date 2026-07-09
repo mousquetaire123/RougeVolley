@@ -135,6 +135,17 @@ public class RougeVolleyFXGL extends GameApplication {
             @Override protected void onActionBegin() { mouseFire = true; }
             @Override protected void onActionEnd() { mouseFire = false; }
         }, MouseButton.PRIMARY);
+
+        input.addAction(new UserAction("Pause") {
+            private boolean toggleGuard;
+            @Override protected void onActionBegin() {
+                if (!toggleGuard) {
+                    toggleGuard = true;
+                    togglePause();
+                }
+            }
+            @Override protected void onActionEnd() { toggleGuard = false; }
+        }, KeyCode.ESCAPE);
     }
 
     @Override
@@ -182,6 +193,11 @@ public class RougeVolleyFXGL extends GameApplication {
 
         gameState.updateEntities(dt);
         gameState.addTime(dt);
+
+        // ── 墙壁碰撞校正（实体移动后将陷入墙壁的实体弹回地板） ──
+        if (currentRoom != null) {
+            correctWallCollisions(currentRoom);
+        }
 
         // ── 子弹生命周期过期检查 ──
         double now = gameState.getElapsedTime();
@@ -287,10 +303,10 @@ public class RougeVolleyFXGL extends GameApplication {
         spawnPlayerInRoom();
         ensureEnemyRenderNodes();
 
-        cameraX = clamp(player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0,
-            worldMinX, worldMaxX - GameConfig.VIEWPORT_WIDTH);
-        cameraY = clamp(player.getY() - GameConfig.VIEWPORT_HEIGHT / 2.0,
-            worldMinY, worldMaxY - GameConfig.VIEWPORT_HEIGHT);
+        cameraX = Math.min(player.getX() - GameConfig.VIEWPORT_WIDTH / 2.0,
+            worldMaxX - GameConfig.VIEWPORT_WIDTH);
+        cameraY = Math.min(player.getY() - GameConfig.VIEWPORT_HEIGHT / 2.0,
+            worldMaxY - GameConfig.VIEWPORT_HEIGHT);
         applyCameraPosition();
 
         log.info("New game started. Player at (" + player.getX() + ", " + player.getY() + ")");
@@ -410,6 +426,12 @@ public class RougeVolleyFXGL extends GameApplication {
         }
     }
 
+    /** ESC 暂停/继续切换（仅在游戏进行中有效） */
+    private void togglePause() {
+        if (!gameStarted || gameState.isGameOver()) return;
+        gameUI.togglePauseMenu();
+    }
+
     // ── 输入 ──
 
     private void handleInput(double dt) {
@@ -429,7 +451,34 @@ public class RougeVolleyFXGL extends GameApplication {
         if (len > 0) {
             dx /= len;
             dy /= len;
-            mc.setVelocity(dx * pc.getSpeed(), dy * pc.getSpeed());
+            double vx = dx * pc.getSpeed();
+            double vy = dy * pc.getSpeed();
+
+            // ── 墙壁物理碰撞（轴分离预判，防止穿墙） ──
+            if (currentRoom != null) {
+                RoomTemplate t = currentRoom.getTemplate();
+                double rwx = currentRoom.getWorldX();
+                double rwy = currentRoom.getWorldY();
+                int T = GameConfig.TILE_SIZE;
+                double size = pc.getSize();
+
+                // X 轴独立检测：若下一步会进入墙壁则阻止 X 方向移动
+                double nextX = player.getX() + vx * dt;
+                if (!isPositionValid(t, rwx, rwy, T, nextX, player.getY(), size)) {
+                    vx = 0;
+                }
+                // Y 轴独立检测：允许沿墙滑动
+                double nextY = player.getY() + vy * dt;
+                if (!isPositionValid(t, rwx, rwy, T, player.getX(), nextY, size)) {
+                    vy = 0;
+                }
+            }
+
+            if (vx == 0 && vy == 0) {
+                mc.stop();
+            } else {
+                mc.setVelocity(vx, vy);
+            }
             FXGL.getEventBus().fireEvent(new Event(GameEvent.PLAYER_MOVED_EVENT));
         } else {
             mc.stop();
@@ -447,7 +496,8 @@ public class RougeVolleyFXGL extends GameApplication {
     // ── 摄像机 ──
 
     /**
-     * 平滑跟随玩家并限制在动态世界边界内
+     * 平滑跟随玩家。仅限制右/下边界防止滚动超出地牢，
+     * 左/上允许负值偏移，确保玩家始终在视口中心。
      */
     private void updateCamera(double dt) {
         if (player == null) return;
@@ -459,13 +509,11 @@ public class RougeVolleyFXGL extends GameApplication {
         cameraX += (targetX - cameraX) * lerpFactor;
         cameraY += (targetY - cameraY) * lerpFactor;
 
-        cameraX = clamp(cameraX, 0, GameConfig.WORLD_WIDTH - GameConfig.VIEWPORT_WIDTH);
-        cameraY = clamp(cameraY, 0, GameConfig.WORLD_HEIGHT - GameConfig.VIEWPORT_HEIGHT);
-        // 限制在动态世界边界内（由地牢房间包围盒计算）
+        // 仅限制右/下边界，允许左/上越界以居中玩家
         double boundRight = Math.max(worldMaxX - GameConfig.VIEWPORT_WIDTH, worldMinX);
         double boundBottom = Math.max(worldMaxY - GameConfig.VIEWPORT_HEIGHT, worldMinY);
-        cameraX = clamp(cameraX, worldMinX, boundRight);
-        cameraY = clamp(cameraY, worldMinY, boundBottom);
+        cameraX = Math.min(cameraX, boundRight);
+        cameraY = Math.min(cameraY, boundBottom);
 
         applyCameraPosition();
     }
@@ -487,13 +535,19 @@ public class RougeVolleyFXGL extends GameApplication {
     private void checkDoorTransitions() {
         if (currentRoom == null || player == null) return;
 
+        double ps = GameConfig.PLAYER_SIZE;
+        double px = player.getX();
+        double py = player.getY();
+
         for (String dir : currentRoom.getDoorDirections()) {
             if (!currentRoom.canPassThrough(dir)) continue;
 
             var doorBounds = currentRoom.getDoorWorldBounds(dir);
             if (doorBounds == null) continue;
 
-            if (doorBounds.contains(player.getX(), player.getY())) {
+            // AABB 重叠检测：玩家包围盒 vs 门区域（而非仅检测左上角点）
+            if (px < doorBounds.getMaxX() && px + ps > doorBounds.getMinX()
+                && py < doorBounds.getMaxY() && py + ps > doorBounds.getMinY()) {
                 transitionToRoom(dir);
                 break;
             }
@@ -525,9 +579,7 @@ public class RougeVolleyFXGL extends GameApplication {
 
         log.info("Transitioning " + direction + " → room (" + targetGx + "," + targetGy + ")");
 
-        // ── 停用当前房间 ──
-        currentRoom.deactivate(gameState);
-        // 移除当前房间实体的渲染节点（玩家除外）
+        // ── 先移除当前房间实体的渲染节点（必须在 deactivate 前，因为 deactivate 会从实体列表移除敌人） ──
         for (Entity e : gameState.getEntities()) {
             if (e != player && renderNodes.containsKey(e.getUuid())) {
                 javafx.scene.Node node = renderNodes.remove(e.getUuid());
@@ -536,6 +588,8 @@ public class RougeVolleyFXGL extends GameApplication {
                 }
             }
         }
+        // ── 停用当前房间（销毁敌人实体并从全局列表移除） ──
+        currentRoom.deactivate(gameState);
 
         // ── 清除 tiles ──
         if (tileRenderer != null) {
@@ -556,6 +610,11 @@ public class RougeVolleyFXGL extends GameApplication {
             }
         }
 
+        // ── 将所有实体置顶（tile 重建后新 tile 会覆盖旧实体节点） ──
+        for (javafx.scene.Node node : renderNodes.values()) {
+            node.toFront();
+        }
+
         // ── 将玩家传送到目标房间的对面门位置 ──
         String oppositeDir = getOppositeDirection(direction);
         var oppositeDoor = target.getDoorWorldBounds(oppositeDir);
@@ -563,12 +622,13 @@ public class RougeVolleyFXGL extends GameApplication {
             // 放置在门内侧一点，防止立即再次触发切换
             double spawnX = oppositeDoor.getMinX() + oppositeDoor.getWidth() / 2.0;
             double spawnY = oppositeDoor.getMinY() + oppositeDoor.getHeight() / 2.0;
-            double pushBack = GameConfig.PLAYER_SIZE;
+            // 推向房间内侧足够远，防止立即重新触发门碰撞
+            double pushIn = GameConfig.PLAYER_SIZE * 2 + GameConfig.TILE_SIZE;
             switch (oppositeDir) {
-                case "N" -> spawnY += pushBack;
-                case "S" -> spawnY -= pushBack;
-                case "W" -> spawnX += pushBack;
-                case "E" -> spawnX -= pushBack;
+                case "N" -> spawnY += pushIn;
+                case "S" -> spawnY -= pushIn;
+                case "W" -> spawnX += pushIn;
+                case "E" -> spawnX -= pushIn;
             }
             player.setPosition(new Point2D(spawnX, spawnY));
         }
@@ -731,6 +791,85 @@ public class RougeVolleyFXGL extends GameApplication {
                 cameraX, cameraY
             ));
         }
+    }
+
+    // ============================================================
+    //  墙壁物理碰撞
+    // ============================================================
+
+    /**
+     * 检测包围盒四个角是否全部在地板 tile 上（不被墙壁阻挡）。
+     * 用于玩家预判移动和敌人物理校正。
+     */
+    private static boolean isPositionValid(RoomTemplate template, double rwx, double rwy, int T,
+                                            double x, double y, double size) {
+        int tlx = (int) ((x - rwx) / T);
+        int tly = (int) ((y - rwy) / T);
+        int brx = (int) ((x + size - 1 - rwx) / T);
+        int bry = (int) ((y + size - 1 - rwy) / T);
+        return !template.isWall(tlx, tly)
+            && !template.isWall(brx, tly)
+            && !template.isWall(tlx, bry)
+            && !template.isWall(brx, bry);
+    }
+
+    /**
+     * 移动后校正：检测所有实体包围盒四角是否陷入墙壁，若陷入则弹回最近地板。
+     * 作为玩家轴分离预判的兜底 + 敌人 AI 穿墙的最后防线。
+     */
+    private void correctWallCollisions(Room room) {
+        RoomTemplate template = room.getTemplate();
+        double rwx = room.getWorldX();
+        double rwy = room.getWorldY();
+        int T = GameConfig.TILE_SIZE;
+
+        for (Entity e : gameState.getEntities()) {
+            if (!e.isActive()) continue;
+            double size = getEntitySize(e);
+            if (size <= 0) continue;
+
+            // 四角检测：只要有一个角在墙壁中就校正
+            int tlx = (int) ((e.getX() - rwx) / T);
+            int tly = (int) ((e.getY() - rwy) / T);
+            int brx = (int) ((e.getX() + size - 1 - rwx) / T);
+            int bry = (int) ((e.getY() + size - 1 - rwy) / T);
+
+            boolean inWall = template.isWall(tlx, tly) || template.isWall(brx, tly)
+                          || template.isWall(tlx, bry) || template.isWall(brx, bry);
+            if (!inWall) continue;
+
+            // 用实体中心定位，螺旋搜索最近可行走 tile 并弹回
+            int cx = (int) ((e.getX() + size / 2.0 - rwx) / T);
+            int cy = (int) ((e.getY() + size / 2.0 - rwy) / T);
+            for (int r = 1; r < 12; r++) {
+                boolean found = false;
+                for (int dy = -r; dy <= r && !found; dy++) {
+                    for (int dx = -r; dx <= r && !found; dx++) {
+                        if (Math.abs(dx) < r && Math.abs(dy) < r) continue;
+                        int nx = cx + dx;
+                        int ny = cy + dy;
+                        double candX = rwx + nx * T + (T - size) / 2.0;
+                        double candY = rwy + ny * T + (T - size) / 2.0;
+                        if (isPositionValid(template, rwx, rwy, T, candX, candY, size)) {
+                            e.setPosition(new Point2D(candX, candY));
+                            found = true;
+                        }
+                    }
+                }
+                if (found) break;
+            }
+        }
+    }
+
+    /** 返回实体的碰撞尺寸，用于墙壁检测。子弹返回 0（不参与墙壁碰撞）。 */
+    private double getEntitySize(Entity e) {
+        if (e.hasComponent(PlayerComponent.class)) {
+            return e.getComponent(PlayerComponent.class).get().getSize();
+        }
+        if (e.hasComponent(EnemyComponent.class)) {
+            return e.getComponent(EnemyComponent.class).get().getSize();
+        }
+        return 0;
     }
 
     // ============================================================
