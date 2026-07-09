@@ -42,18 +42,37 @@ public class TileRenderer {
     private Room currentRoom;
     private boolean visible = true;
 
-    // 调色板（与现有项目风格一致）
-    private static final Color COLOR_FLOOR        = Color.rgb(48, 48, 58);
-    private static final Color COLOR_WALL         = Color.rgb(70, 70, 85);
-    private static final Color COLOR_WALL_BORDER  = Color.rgb(55, 55, 70);
-    private static final Color COLOR_DOOR         = Color.rgb(90, 80, 60);
-    private static final Color COLOR_FLOOR_STROKE = Color.rgb(38, 38, 48);
-    private static final Color COLOR_DOOR_STROKE  = Color.rgb(120, 100, 70);
-    private static final double WALL_STROKE = 1.0;
+    // ── 调色板（高对比度地牢风格） ──
+    private static final Color COLOR_FLOOR        = Color.rgb(105, 95, 82);
+    private static final Color COLOR_WALL         = Color.rgb(38, 35, 42);
+    private static final Color COLOR_WALL_BORDER  = Color.rgb(22, 20, 28);
+    private static final Color COLOR_DOOR         = Color.rgb(175, 95, 55);
+    private static final Color COLOR_FLOOR_STROKE = Color.rgb(88, 80, 70);
+    private static final Color COLOR_DOOR_STROKE  = Color.rgb(210, 130, 80);
+    private static final double WALL_STROKE = 2.0;
+
+    // ── 各房间类型地板色相偏移（增强房间辨识度） ──
+    private static final Color TINT_CROSSROAD   = Color.rgb(105, 95, 82);   // 默认暖石色
+    private static final Color TINT_CORRIDOR_H  = Color.rgb(95, 97, 105);   // 偏蓝灰
+    private static final Color TINT_CORRIDOR_V  = Color.rgb(108, 88, 78);   // 偏红棕
+    private static final Color TINT_LSHAPE      = Color.rgb(88, 100, 85);   // 偏绿灰
+    private static final Color TINT_HALL        = Color.rgb(115, 108, 95);  // 偏亮金
 
     // ============================================================
     //  构建
     // ============================================================
+
+    /** 根据模板 ID 返回对应的地板颜色，增强不同房间类型的辨识度 */
+    private static Color getFloorColorFor(String templateId) {
+        if (templateId == null) return COLOR_FLOOR;
+        return switch (templateId) {
+            case "room_corridor_h" -> TINT_CORRIDOR_H;
+            case "room_corridor_v" -> TINT_CORRIDOR_V;
+            case "room_lshape"     -> TINT_LSHAPE;
+            case "room_hall"       -> TINT_HALL;
+            default                -> TINT_CROSSROAD; // room_crossroad 及其他
+        };
+    }
 
     /**
      * 为一个 Room 构建所有 tile 的 JavaFX 渲染节点。
@@ -74,6 +93,9 @@ public class TileRenderer {
         int[][] ground = template.getGroundLayer();
         int[][] walls  = template.getWallLayer();
 
+        // 根据房间模板选择地板颜色，增强不同房间类型的辨识度
+        Color floorColor = getFloorColorFor(template.getId());
+
         for (int row = 0; row < template.getHeightTiles(); row++) {
             for (int col = 0; col < template.getWidthTiles(); col++) {
                 double tileWorldX = baseX + col * T;
@@ -81,7 +103,7 @@ public class TileRenderer {
 
                 // --- 地板 ---
                 if (ground[row][col] == RoomTemplate.GID_FLOOR) {
-                    Rectangle floor = new Rectangle(T, T, COLOR_FLOOR);
+                    Rectangle floor = new Rectangle(T, T, floorColor);
                     floor.setStroke(COLOR_FLOOR_STROKE);
                     floor.setStrokeWidth(0.5);
                     addTile(floor, tileWorldX, tileWorldY);
@@ -97,14 +119,16 @@ public class TileRenderer {
             }
         }
 
-        // --- 门标记（半透明色块） ---
+        // --- 门标记（高亮通道） ---
         for (RoomTemplate.DoorDef door : template.getDoors()) {
             double doorWorldX = baseX + door.x;
             double doorWorldY = baseY + door.y;
             Rectangle doorRect = new Rectangle(door.width, door.height, COLOR_DOOR);
-            doorRect.setOpacity(0.45);
+            doorRect.setOpacity(0.75);
             doorRect.setStroke(COLOR_DOOR_STROKE);
-            doorRect.setStrokeWidth(0.5);
+            doorRect.setStrokeWidth(2.5);
+            doorRect.setArcWidth(4);
+            doorRect.setArcHeight(4);
             addTile(doorRect, doorWorldX, doorWorldY);
         }
 
@@ -116,7 +140,7 @@ public class TileRenderer {
      * 添加单个 tile 节点并加入场景。
      */
     private void addTile(Node node, double worldX, double worldY) {
-        // 加入 FXGL 场景（UI 层，与现有渲染方式一致）
+        // 加入 FXGL 场景（UI 层）。添加顺序决定 z-order：地板→墙壁→门→实体
         FXGL.getGameScene().addUINode(node);
         tileEntries.add(new TileEntry(node, worldX, worldY));
     }

@@ -38,35 +38,39 @@ public class DungeonGenerator {
         Room[][] grid = new Room[rows][cols];
         List<Room> rooms = new ArrayList<>();
 
-        // 1. 为每个网格位置随机选取模板并创建 Room
+        // 1. 洗牌后轮询选取模板 — 确保至少每种模板出现一次，避免全随机导致的重复
+        List<RoomTemplate> shuffled = new ArrayList<>(roomPool.getAllTemplates());
+        Collections.shuffle(shuffled, rng);
+        int templateIdx = 0;
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                RoomTemplate template = roomPool.getRandom();
+                RoomTemplate template = shuffled.get(templateIdx % shuffled.size());
+                templateIdx++;
                 Room room = new Room(template, c, r);
                 grid[r][c] = room;
                 rooms.add(room);
             }
         }
 
-        // 2. 连接相邻房间的门
+        // 2. 连接相邻房间的门（相邻房间始终互通，自动补全缺失门方向）
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 Room room = grid[r][c];
-                // 右边邻居 → E ↔ W（仅当两个房间都有对应方向的门）
+                // 右边邻居 → E ↔ W
                 if (c + 1 < cols) {
                     Room right = grid[r][c + 1];
-                    if (room.getDoorDirections().contains("E") && right.getDoorDirections().contains("W")) {
-                        room.setDoorConnected("E", true);
-                        right.setDoorConnected("W", true);
-                    }
+                    room.ensureDoor("E");
+                    right.ensureDoor("W");
+                    room.setDoorConnected("E", true);
+                    right.setDoorConnected("W", true);
                 }
-                // 下方邻居 → S ↔ N（仅当两个房间都有对应方向的门）
+                // 下方邻居 → S ↔ N
                 if (r + 1 < rows) {
                     Room down = grid[r + 1][c];
-                    if (room.getDoorDirections().contains("S") && down.getDoorDirections().contains("N")) {
-                        room.setDoorConnected("S", true);
-                        down.setDoorConnected("N", true);
-                    }
+                    room.ensureDoor("S");
+                    down.ensureDoor("N");
+                    room.setDoorConnected("S", true);
+                    down.setDoorConnected("N", true);
                 }
             }
         }

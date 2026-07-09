@@ -2,6 +2,7 @@ package org.example.rougevolley.dungeon;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import org.example.rougevolley.config.GameConfig;
 import org.example.rougevolley.ecs.Entity;
 import org.example.rougevolley.ecs.components.HealthComponent;
 import org.example.rougevolley.entity.EntityFactory;
@@ -144,24 +145,40 @@ public class Room {
         doorConnected.put(direction, connected);
     }
 
-    /** 获取世界空间中门的矩形区域（用于碰撞检测） */
+    /** 获取世界空间中门的矩形区域（用于碰撞检测）。模板未定义的方向自动在墙壁中间开口。 */
     public Rectangle2D getDoorWorldBounds(String direction) {
         for (RoomTemplate.DoorDef door : template.getDoors()) {
             if (door.direction.equals(direction)) {
                 return new Rectangle2D(
-                    worldX + door.x - 4,   // 略微扩大碰撞区域
+                    worldX + door.x - 4,
                     worldY + door.y - 4,
                     door.width + 8,
                     door.height + 8
                 );
             }
         }
-        return null;
+        // 模板未定义 → 在墙壁中间生成默认门（2 tile 宽 × 1 tile 高）
+        int T = GameConfig.TILE_SIZE;
+        double rw = template.getWidthPixels();
+        double rh = template.getHeightPixels();
+        double dw = T * 2;
+        return switch (direction) {
+            case "N" -> new Rectangle2D(worldX + (rw - dw) / 2, worldY - 4, dw, T + 8);
+            case "S" -> new Rectangle2D(worldX + (rw - dw) / 2, worldY + rh - T - 4, dw, T + 8);
+            case "W" -> new Rectangle2D(worldX - 4, worldY + (rh - dw) / 2, T + 8, dw);
+            case "E" -> new Rectangle2D(worldX + rw - T - 4, worldY + (rh - dw) / 2, T + 8, dw);
+            default -> null;
+        };
     }
 
     /** 该方向是否有门且可通行（已连接） */
     public boolean canPassThrough(String direction) {
         return doorConnected.containsKey(direction) && doorConnected.get(direction);
+    }
+
+    /** 确保指定方向存在门记录（用于 DungeonGenerator 动态添加相邻门） */
+    public void ensureDoor(String direction) {
+        doorConnected.putIfAbsent(direction, false);
     }
 
     // ============================================================
