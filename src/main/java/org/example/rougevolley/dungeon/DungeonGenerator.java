@@ -103,18 +103,18 @@ public class DungeonGenerator {
                 // 右边邻居 → E ↔ W
                 if (c + 1 < cols) {
                     Room right = grid[r][c + 1];
-                    room.ensureDoor("E");
-                    right.ensureDoor("W");
-                    room.setDoorConnected("E", true);
-                    right.setDoorConnected("W", true);
+                    if (room.getDoorDirections().contains("E") && right.getDoorDirections().contains("W")) {
+                        room.setDoorConnected("E", true);
+                        right.setDoorConnected("W", true);
+                    }
                 }
                 // 下方邻居 → S ↔ N
                 if (r + 1 < rows) {
                     Room down = grid[r + 1][c];
-                    room.ensureDoor("S");
-                    down.ensureDoor("N");
-                    room.setDoorConnected("S", true);
-                    down.setDoorConnected("N", true);
+                    if (room.getDoorDirections().contains("S") && down.getDoorDirections().contains("N")) {
+                        room.setDoorConnected("S", true);
+                        down.setDoorConnected("N", true);
+                    }
                 }
             }
         }
