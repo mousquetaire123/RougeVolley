@@ -215,7 +215,7 @@ src/main/resources/
 
 ## 📄 许可
 
-本项目用于学习与演示目的。
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
