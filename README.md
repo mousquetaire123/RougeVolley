@@ -26,8 +26,8 @@
 - **Maven 3.8+**
 
 ### 运行游戏
-
-```bash
+- 从源代码进入
+```bash 
 # 编译
 mvn clean compile
 
@@ -37,8 +37,8 @@ mvn javafx:run
 # 打包为 JAR
 mvn clean package
 ```
-
-也可直接在 IDE 中运行 `org.example.Main` 主类。
+-直接安装release也可运行
+-也可直接在 IDE 中运行 `org.example.Main` 主类。
 
 ---
 
